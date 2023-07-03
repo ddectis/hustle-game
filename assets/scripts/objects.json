@@ -1,0 +1,37 @@
+{
+  "locations": [
+    {
+      "name": "Manhattan"
+
+    },
+    {
+      "name": "Harlem"
+
+    },
+    {
+      "name": "Bronx"
+
+    },
+    {
+      "name": "Brooklyn"
+
+    },
+    {
+      "name": "Queens"
+
+    }
+
+  ],
+
+  "playerInfo": {
+    "cash": 5000,
+    "debt": 5000,
+    "maxHealth": 100,
+    "stashSize": 100
+
+  }
+    
+
+    
+  
+}

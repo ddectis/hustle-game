@@ -1,0 +1,148 @@
+﻿
+@import url('https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&display=swap');
+
+
+html {
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, ol, ul {
+    margin: 0;
+    padding: 0;
+    font-weight: normal;
+}
+
+ol, ul {
+    list-style: none;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+h1{
+    font-size:3em
+}
+
+p{
+    text-align:center;
+}
+
+body {
+    background-color: #252525;
+    font-family: 'JetBrains Mono', monospace;
+    color: #6cda82;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    justify-content: space-between;
+    align-items:center;
+}
+
+
+.title{
+    display:flex;
+    justify-content:center;
+
+}
+
+.status-holder{
+    display:flex;
+    justify-content:center;
+}
+
+.status {
+    display: flex;
+    justify-content: center;
+    max-width: 80%;
+    outline: 3px double #6cda82;
+    padding:3%;
+    border-radius: 3px;
+    backg
+}
+
+.button {
+    border: solid 2px #6cda82;
+    padding-inline: 25px;
+    padding-block: 15px;
+    border-radius: 5px;
+    text-align: center;
+    background-color: #6cda82;
+    color: #252525;
+    font-weight:bold;
+    text-decoration: underline;
+}
+
+.button:hover{
+    text-decoration:none;
+}
+
+
+.footer{
+    font-size:0.75em;
+    margin-bottom:10px;
+}
+
+a{
+    color:currentColor;
+    font-weight:bold;
+}
+
+.ui-holder {
+    display: flex;
+    justify-content: center;
+    outline: 3px double #6cda82;
+    flex-direction: column;
+    align-items: center;
+    min-width: 66%;
+    max-width:85%;
+}
+
+.button-holder{
+    display: flex; 
+}
+
+.travel-button-holder {
+    display: flex;
+    flex-wrap:wrap;
+    justify-content:center;
+}
+
+.stats-holder {
+    display: flex;
+    
+    padding-inline: 15%;
+    padding-block: 5%;
+}
+
+.stats-headers {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+}
+
+.stats-data{
+
+}
+
+.stats-spacer{
+    padding:5px;
+}
+
+.hide {
+    display: none
+}
+
+@media screen and (min-width: 600px){
+    .status {
+
+        max-width: 66%;
+    }
+}
