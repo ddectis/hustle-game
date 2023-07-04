@@ -1,3 +1,5 @@
+//pull in Dave's random functions
+import Random from './Random.js';
 
 //create references to all buttons in the game here.
 const gameStartButton = document.querySelector("#game-start-button")
@@ -8,7 +10,26 @@ const statusMessageHolder = document.querySelector("#status-message")
 const statusHeading = document.querySelector("#status-header") //once the player clears the intro tabs, this STATUS heading appears in the status box that had up to that point been used for the intro text
 const infoPanel = document.querySelector("#info-panel")
 const actionPanel = document.querySelector("#action-panel")
+
+//create references to all of the different activity screens
+const travelActivityButton = document.querySelector("#activity-travel");
+const dealActivityButton = document.querySelector("#activity-deal");
+const loanActivityButton = document.querySelector("#activity-loan");
+const bankActivityButton = document.querySelector("#activity-bank")
+
+const activityButtons = [travelActivityButton,dealActivityButton,loanActivityButton,bankActivityButton]
+
+console.log("Bank: " + bankActivityButton)
+
 const travelButtonHolder = document.querySelector("#travel-buttons")
+
+//create references fo all of the different action screens
+const travelPanel = document.querySelector("#travel-panel");
+const dealPanel = document.querySelector("#deal-panel");
+const loanPanel = document.querySelector("#loan-panel");
+const bankPanel = document.querySelector("#bank-panel");
+
+const activityPanels = [travelPanel, dealPanel, loanPanel, bankPanel];
 
 //references to player stats on the UI info panel
 const cashUI = document.querySelector("#cash")
@@ -67,13 +88,15 @@ let bronxButton = "";
 let brooklynButton = "";
 let queensButton = "";
 
-
+let cannabisPrice = 0;
+const cannabisPriceUI = document.querySelector("#cannabis-price")
 
 const printWelcomeMessage = () => {
     statusMessageHolder.innerHTML = welcomeMessage;
 }
 
 //load a JSON that contains data to use in the game
+//other game initialization logic is triggered here after the json is loaded
 const loadObjectsJSON = async() => {
     try {
         const response = await fetch('./assets/scripts/objects.json');
@@ -107,6 +130,7 @@ const loadObjectsJSON = async() => {
 
     updateInfoPanelStats(); //and print their values
     createTravelButtons();
+    randomizeDrugPrices();
     
 
 }
@@ -158,6 +182,8 @@ const travelClick = destination => {
     console.log("Interest: " + interest);
     updateStatusMessage();
     updateInfoPanelStats();
+    listAvailableActivities();
+    randomizeDrugPrices();
 
 }
 
@@ -208,15 +234,78 @@ const updateStatusMessage = () => {
     statusMessageHolder.innerHTML = statusMessage;
 }
 
+const listAvailableActivities = () => {
+    console.log("listing available activities for: " + burroughs[currentLocation].name)
+    if (burroughs[currentLocation].services.bank) {
+        bankActivityButton.classList.remove("hide")
+    } else {
+        bankActivityButton.classList.add("hide")
+    }
 
-//update the objects json so that each of the locations specifies which activities are available
-//some activities will be available at all locations (dealing, traveling)
-//others will only be available at 1 or some (visit loan shark, visit the bank, weapons dealer, upgrade shop)
+    if (burroughs[currentLocation].services.deal) {
+        dealActivityButton.classList.remove("hide")
+    } else {
+        dealActivityButton.classList.add("hide")
+    }
+
+    if (burroughs[currentLocation].services.loanShark) {
+        loanActivityButton.classList.remove("hide")
+    } else {
+        loanActivityButton.classList.add("hide")
+    }
+
+    if (burroughs[currentLocation].services.travel) {
+        travelActivityButton.classList.remove("hide")
+    } else {
+        travelActivityButton.classList.add("hide")
+    }
+}
 
 
+//handle activity button clicks
+
+travelActivityButton.addEventListener("click", event => {
+    console.log("travel button clicked");
+    hideAllActionPanels();
+    travelPanel.classList.remove("hide");
+
+})
+dealActivityButton.addEventListener("click", event => {
+    console.log("deal button clicked");
+    hideAllActionPanels();
+    dealPanel.classList.remove("hide");
+})
+loanActivityButton.addEventListener("click", event => {
+    console.log("loan button clicked");
+    hideAllActionPanels();
+    loanPanel.classList.remove("hide");
+})
+bankActivityButton.addEventListener("click", event => {
+    console.log("bank button clicked");
+    hideAllActionPanels();
+    bankPanel.classList.remove("hide");
+})
+
+const hideAllActionPanels = () => {
+    activityPanels.forEach(panel => {
+        panel.classList.add("hide")
+    })
+}
+
+const randomizeDrugPrices = () => {
+    console.log("randomizing drug prices");
+    let rnd = Random.int(50, 500)
+
+    cannabisPrice = rnd;
+    console.log("Rand: " + cannabisPrice);
 
 
+    printDrugPrices();
+}
 
+const printDrugPrices = () => {
+    cannabisPriceUI.textContent = `$${cannabisPrice}`
+}
 
 //this logic runs on page load
 printWelcomeMessage(); //put the intro message on the screen
