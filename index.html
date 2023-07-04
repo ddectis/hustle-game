@@ -11,43 +11,46 @@
 <body>
 
     <div class="title">
-        <h1>It's Hustle Time!</h1>
+        <h1>Hustle!</h1>
 
     </div>
 
 
-    <div class="ui-holder hide" id="info-panel">
-        <h2>Info</h2>
-        <div class="stats-holder">
+    <div class="ui-and-status">
+        <div class="ui-holder hide" id="info-panel">
+            <h2>Info</h2>
+            <div class="stats-holder">
 
-            <div class="stats-headers">
-                <div>Cash: </div>
-                <div>Debt: </div>
-                <div>Health: </div>
-                <div>Stash: </div>
+                <div class="stats-headers">
+                    <div>Cash: </div>
+                    <div>Debt: </div>
+                    <div>Health: </div>
+                    <div>Stash: </div>
+
+
+                </div>
+                <div class="stats-spacer"></div>
+                <div class="stats-data">
+                    <div id="cash">$1,234</div>
+                    <div id="debt">$5,678 </div>
+                    <div id="health">100 / 100 </div>
+                    <div id="stash">85 / 100</div>
+
+
+                </div>
 
 
             </div>
-            <div class="stats-spacer"></div>
-            <div class="stats-data">
-                <div id="cash">$1,234</div>
-                <div id="debt">$5,678 </div>
-                <div id="health">100 / 100 </div>
-                <div id="stash">85 / 100</div>
+        </div>
 
+        <div class="status-holder">
+            <h2 class="hide" id="status-header">Status</h2>
+            <div class="status" id="status-message">
 
             </div>
-
-
         </div>
     </div>
-
-    <div class="status-holder">
-        <h2 class="hide" id="status-header">Status</h2>
-        <div class="status" id="status-message">
-            
-        </div>
-    </div>
+    
         
 
     <div class="button-holder">
@@ -56,14 +59,26 @@
 
     </div>
 
-    <div class="ui-holder hide" id="action-panel">
-        <h2>Available Actions</h2>
-        <div class="travel-button-holder" id="travel-buttons">
-            
-
-
+    <div class="actions-holder hide" id="action-panel">
+        <div class="actions">
+            <h2>Travel</h2>
+            <p>*Costs 1 day*</p>
+            <div class="travel-button-holder" id="travel-buttons">
+                
+            </div>
         </div>
+        <div class="actions">
+            <h2>Activities</h2>
+            
+            <div class="activity-button-holder" id="activity-buttons">
+                <div class="button" id="game-start-button">Travel</div>
+
+
+            </div>
+        </div>
+
     </div>
+
 
 
     <div class="footer">HustleTime is a Funtime Learning Project by <a href="https://dectronica.com/">Dectronica</a> </div>

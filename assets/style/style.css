@@ -27,8 +27,16 @@ img {
 }
 
 h1{
-    font-size:3em
+    font-size:3em;
+    font-weight:bold
+    
 }
+
+h2{
+    text-decoration:underline;
+    font-weight:bold;
+}
+
 
 p{
     text-align:center;
@@ -41,7 +49,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    justify-content: space-between;
+    justify-content: center;
     align-items:center;
 }
 
@@ -52,31 +60,41 @@ body {
 
 }
 
-.status-holder{
-    display:flex;
-    justify-content:center;
+.status-holder {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ui-and-status {
+    display: flex;
+    flex-direction: row;
+    border: 3px double;
+    max-width:97%;
 }
 
 .status {
     display: flex;
     justify-content: center;
-    max-width: 80%;
-    outline: 3px double #6cda82;
+    
+    
     padding:3%;
     border-radius: 3px;
-    backg
+    
 }
 
 .button {
     border: solid 2px #6cda82;
-    padding-inline: 25px;
-    padding-block: 15px;
+    padding-inline: 15px;
+    padding-block: 5px;
     border-radius: 5px;
     text-align: center;
     background-color: #6cda82;
     color: #252525;
     font-weight:bold;
     text-decoration: underline;
+    margin:5px;
 }
 
 .button:hover{
@@ -100,9 +118,20 @@ a{
     outline: 3px double #6cda82;
     flex-direction: column;
     align-items: center;
-    min-width: 66%;
+    min-width: 50%;
     max-width:85%;
 }
+
+.actions-holder {
+    display: flex;
+    justify-content: center;
+    
+    flex-direction: row;
+    align-items: flex-start;
+    min-width: 50%;
+    max-width: 85%;
+}
+
 
 .button-holder{
     display: flex; 
@@ -112,13 +141,22 @@ a{
     display: flex;
     flex-wrap:wrap;
     justify-content:center;
+    flex-direction:column;
 }
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    outline: 3px double #6cda82;
+    padding:5px;
+    margin:2px;
+    min-width:75%;
+}
+
 
 .stats-holder {
     display: flex;
-    
-    padding-inline: 15%;
-    padding-block: 5%;
 }
 
 .stats-headers {

@@ -1,23 +1,54 @@
 {
   "locations": [
     {
-      "name": "Manhattan"
+      "name": "Manhattan",
+      "services": {
+        "deal": true,
+        "travel": true,
+        "bank": true,
+        "loanShark": true
+      }
 
     },
     {
-      "name": "Harlem"
+      "name": "Harlem",
+      "services": {
+        "deal": true,
+        "travel": true,
+        "bank": false,
+        "loanShark": false
+      }
+
 
     },
     {
-      "name": "Bronx"
+      "name": "Bronx",
+      "services": {
+        "deal": true,
+        "travel": true,
+        "bank": false,
+        "loanShark": false
+      }
 
     },
     {
-      "name": "Brooklyn"
+      "name": "Brooklyn",
+      "services": {
+        "deal": true,
+        "travel": true,
+        "bank": false,
+        "loanShark": false
+      }
 
     },
     {
-      "name": "Queens"
+      "name": "Queens",
+      "services": {
+        "deal": true,
+        "travel": true,
+        "bank": false,
+        "loanShark": false
+      }
 
     }
 
