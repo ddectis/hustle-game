@@ -26,24 +26,28 @@ img {
     height: auto;
 }
 
-h1{
-    font-size:3em;
-    font-weight:bold
-    
+h1 {
+    font-size: 4em;
+    font-weight: bold;
+    font-variant: small-caps;
+    letter-spacing: 20px;
+    font-style:oblique
 }
 
 h2{
     text-decoration:underline;
     font-weight:bold;
     font-weight:bold;
+    text-align:center;
 }
 
 h3{
-
+    text-align:center;
 }
 
 p{
     text-align:center;
+    font-size:1.33em;
 }
 
 body {
@@ -61,7 +65,7 @@ body {
 .title{
     display:flex;
     justify-content:center;
-
+    margin:10px;
 }
 
 .status-holder {
@@ -108,7 +112,8 @@ body {
 
 .footer{
     font-size:0.75em;
-    margin-bottom:10px;
+    
+    margin-block:20px;
 }
 
 a{
@@ -142,7 +147,7 @@ a{
     flex-wrap: wrap;
     justify-content: center;
 }
-}
+
 
 .button-holder{
     display: flex; 
@@ -152,7 +157,7 @@ a{
     display: flex;
     flex-wrap:wrap;
     justify-content:center;
-    flex-direction:column;
+    flex-direction:row;
 }
 
 .deal-info-holder {
@@ -171,7 +176,6 @@ a{
     width: 100%;
     padding-block: 10px;
     flex-direction: column;
-    align-items: center;
 }
 
 
@@ -194,9 +198,7 @@ a{
     padding:5px;
 }
 
-.hide {
-    display: none
-}
+
 
 .drug-deal {
     outline: 3px double #6cda82;
@@ -210,6 +212,20 @@ a{
     flex-direction: row;
     justify-content: space-between;
     width: 55%;
+}
+
+.horizontal {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.add-space-top{
+    margin-top:20px;
+}
+
+.hide {
+    display: none
 }
 
 @media screen and (min-width: 600px) {

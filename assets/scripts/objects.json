@@ -61,7 +61,8 @@
     "maxStash": 100,
     "inventory": {
       "cannabis": 0,
-      "shrooms":  0
+      "shrooms": 0,
+      "bootleg liquor": 0
     } 
   },
 
@@ -82,8 +83,15 @@
       "sellPrice": 0,
       "id": "shrooms-deal"
 
+    },
+    {
+      "name": "Bootleg Liquor",
+      "minPrice": 75,
+      "maxPrice": 250,
+      "buyPrice": 0,
+      "sellPrice": 0,
+      "id": "booze-deal"
     }
-
   ]
     
 

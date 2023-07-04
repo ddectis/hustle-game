@@ -26,6 +26,9 @@ console.log("Bank: " + bankActivityButton)
 const travelButtonHolder = document.querySelector("#travel-buttons");
 const dealButtonHolder = document.querySelector("#deal-buttons");
 
+const activitiesInInfo = document.querySelector("#activities-in");
+
+
 //create references fo all of the different action screens
 const travelPanel = document.querySelector("#travel-panel");
 const dealPanel = document.querySelector("#deal-panel");
@@ -35,6 +38,13 @@ const stashPanel = document.querySelector("#stash-panel");
 
 const activityPanels = [travelPanel, dealPanel, loanPanel, bankPanel, stashPanel];
 
+const moveMaximumPossibleToggle = document.querySelector("#moveMaximumProduct");
+let moveMaximumPossible = false;
+moveMaximumPossibleToggle.addEventListener("change", event => {
+    console.log("change detected");
+    console.log(event.srcElement.checked)
+    moveMaximumPossible = event.srcElement.checked;
+})
 
 //handle activity button clicks
 travelActivityButton.addEventListener("click", event => {
@@ -114,10 +124,13 @@ let cannabisBuy = "";
 let cannabisSell = "";
 let shroomsBuy = "";
 let shroomsSells = "";
+let boozeBuy = "";
+let boozeSell = "";
 
 //define drug price info placeholders
 let cannabisInfo = "";
 let shroomsInfo = "";
+let boozeInfo = "";
 
 
 
@@ -197,6 +210,7 @@ const loadObjectsJSON = async() => {
     updateInfoPanelStats(); //and print their values
     createTravelButtons();
     randomizeDrugPrices();
+    listAvailableActivities();
     
 
 }
@@ -294,12 +308,14 @@ const updateInfoPanelStats = () => {
 }
 
 const updateStatusMessage = () => {
-    statusMessage = `<p>It is Day ${day}. You are currently in ${burroughs[currentLocation].name}</p>`
+    statusMessage = `<p>It is Day ${day}.</p>`
     statusMessageHolder.innerHTML = statusMessage;
 }
 
 const listAvailableActivities = () => {
     console.log("listing available activities for: " + burroughs[currentLocation].name)
+    
+    activitiesInInfo.textContent = `Activities in ${burroughs[currentLocation].name}`
     if (burroughs[currentLocation].services.bank) {
         bankActivityButton.classList.remove("hide")
     } else {
@@ -349,6 +365,7 @@ const randomizeDrugPrices = () => {
 
 
 //run this code only once. It will create the list of drugs adn attach listeners to the buttons on that list
+//add new drugs here
 const initializeDrugList= () => {
     
     drugs.forEach(drug => {
@@ -388,15 +405,29 @@ const initializeDrugList= () => {
         sellDrug(1);
     })
 
+    boozeBuy= document.querySelector("#booze-deal-buy");
+    boozeBuy.addEventListener("click", event => {
+        console.log("buy booze!")
+        buyDrug(2);
+    })
+
+    boozeSell = document.querySelector("#booze-deal-sell");
+    boozeSell.addEventListener("click", event => {
+        console.log("sell booze!")
+        sellDrug(2);
+    })
+    
+
     cannabisInfo = document.querySelector("#Cannabis-price");
     shroomsInfo = document.querySelector("#Shrooms-price");
+    boozeInfo = document.querySelector("#Bootleg");
 
 
     drugListInitialized = true;
 }
 
 const printDrugPrices = () => {
-    let drugInfoArray = [cannabisInfo, shroomsInfo];
+    let drugInfoArray = [cannabisInfo, shroomsInfo, boozeInfo];
     let index = 0;
     drugInfoArray.forEach(entry => {
         console.log("here we go now")
@@ -411,6 +442,7 @@ const printDrugPrices = () => {
 
 const buyDrug = drugIndex => {
 
+    let index = drugIndex;
     let currentPrice = drugs[drugIndex].buyPrice;
     let name = drugs[drugIndex].name.toLowerCase();
 
@@ -422,11 +454,18 @@ const buyDrug = drugIndex => {
         cash -= currentPrice;
         console.log(inventory);
         updateInfoPanelStats();
+        //move maximum possible tries to buy / sell the max amount permitted by cash or by inventory
+        if (moveMaximumPossible) {
+            buyDrug(index);
+        } else {
+            console.error("insufficient funds or capacity to buy another unit of " + name)
+        }
     }
     
 }
 
 const sellDrug = drugIndex => {
+    let index = drugIndex;
     let currentPrice = drugs[drugIndex].sellPrice;
     let name = drugs[drugIndex].name.toLowerCase();
 
@@ -437,6 +476,9 @@ const sellDrug = drugIndex => {
         countHeld--;
         cash += currentPrice;
         updateInfoPanelStats();
+        if (moveMaximumPossible) {
+            sellDrug(index);
+        }
     } else {
         console.error("no more " + name + " in inventory")
     }
@@ -448,3 +490,7 @@ loadObjectsJSON(); //and load the JSON objects for things like locations
 printWelcomeMessage(); //put the intro message on the screen
 
 
+//to add a new drug:
+//add placeholder entries at the top
+//add entries in "initializeDrugList"
+//add json info - both in the drug category and then again in the inventory (you should probably generate the inventory dynamically based on a forEach of the names of the drugs in the drug list)

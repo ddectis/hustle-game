@@ -54,7 +54,7 @@
         
 
     <div class="button-holder">
-        <div class="button" id="game-start-button">Well, shit. Let's get started</div>
+        <div class="button add-space-top" id="game-start-button"><h2>Well, shit. Let's get started</h2></div>
         <div class="button hide" id="continue-from-intro-button">Uhh...that sounds ominous.<br /><br /> Time to hit the streets</div>
 
     </div>
@@ -62,7 +62,7 @@
     <div class="actions-holder hide" id="action-panel">
 
         <div class="actions" id="activity-buttons">
-            <h2>Activities</h2>
+            <h2 id="activities-in">Activities</h2>
 
             <div class="activity-button-holder" id="activity-buttons">
                 <div class="button" id="activity-deal">Buy & Sell</div>
@@ -74,8 +74,21 @@
         </div>
 
         <div class="actions hide" id="deal-panel">
-            <h2>Make Deals</h2>
-            <br />
+            <div class="horizontal">
+                
+                <h2>Make Deals</h2>
+                <div class="stats-spacer"></div>
+                
+
+                <div>
+                    <input type="checkbox" id="moveMaximumProduct" />
+                    <label for="moveMaximumProduct">Buy / Sell Max</label>
+                </div>
+                
+                <br />
+
+            </div>
+            
             <div class="deal-info-holder" id="deal-buttons">
 
             </div>
@@ -112,7 +125,7 @@
 
 
 
-    <div class="footer">HustleTime is a <a href="https://dectronica.com/">Dectronica</a> Funtime Learning Project</div>
+    <div class="footer">HustleTime is a <a href="https://dectronica.com/" target="_blank">Dectronica</a> Funtime Learning Project</div>
 
     <script type="module" src="./assets/scripts/index.js"></script>
 </body>
