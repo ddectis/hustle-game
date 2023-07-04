@@ -16,20 +16,65 @@ const travelActivityButton = document.querySelector("#activity-travel");
 const dealActivityButton = document.querySelector("#activity-deal");
 const loanActivityButton = document.querySelector("#activity-loan");
 const bankActivityButton = document.querySelector("#activity-bank")
+const viewStashButton = document.querySelector("#activity-stash")
 
 const activityButtons = [travelActivityButton,dealActivityButton,loanActivityButton,bankActivityButton]
 
 console.log("Bank: " + bankActivityButton)
 
-const travelButtonHolder = document.querySelector("#travel-buttons")
+//these holders are used to hold programmatically generated html i.e. a bunch of buttons
+const travelButtonHolder = document.querySelector("#travel-buttons");
+const dealButtonHolder = document.querySelector("#deal-buttons");
 
 //create references fo all of the different action screens
 const travelPanel = document.querySelector("#travel-panel");
 const dealPanel = document.querySelector("#deal-panel");
 const loanPanel = document.querySelector("#loan-panel");
 const bankPanel = document.querySelector("#bank-panel");
+const stashPanel = document.querySelector("#stash-panel");
 
-const activityPanels = [travelPanel, dealPanel, loanPanel, bankPanel];
+const activityPanels = [travelPanel, dealPanel, loanPanel, bankPanel, stashPanel];
+
+
+//handle activity button clicks
+travelActivityButton.addEventListener("click", event => {
+    console.log("travel button clicked");
+    hideAllActionPanels();
+    travelPanel.classList.remove("hide");
+
+})
+dealActivityButton.addEventListener("click", event => {
+    console.log("deal button clicked");
+    showDealPanel();    
+})
+loanActivityButton.addEventListener("click", event => {
+    console.log("loan button clicked");
+    hideAllActionPanels();
+    loanPanel.classList.remove("hide");
+})
+bankActivityButton.addEventListener("click", event => {
+    console.log("bank button clicked");
+    hideAllActionPanels();
+    bankPanel.classList.remove("hide");
+})
+viewStashButton.addEventListener("click", event => {
+    console.log("stash button clicked");
+    hideAllActionPanels();
+    stashPanel.classList.remove("hide");
+})
+
+const showDealPanel = () => {
+    hideAllActionPanels();
+    dealPanel.classList.remove("hide");
+}
+
+const hideAllActionPanels = () => {
+    activityPanels.forEach(panel => {
+        panel.classList.add("hide")
+    })
+}
+
+
 
 //references to player stats on the UI info panel
 const cashUI = document.querySelector("#cash")
@@ -40,6 +85,44 @@ const stashUI = document.querySelector("#stash")
 
 let interestRate = 10; 
 let currentLocation = 0; //this is an array index value that connects to "locations" which is an array of location objects
+
+let statusMessage = "";
+
+
+let burroughs = {}; //this is an object that will contain additional info about each location e.g. services,  etc
+let drugs = {};
+let inventory = {};
+
+//define player stats placeholders
+let cash = 0;
+let debt = 0;
+let health = 0;
+let maxHealth = 0;
+let maxStash = 0;
+let countHeld = 0;
+let day = 0;
+
+//define travel button placeholders
+let manhattanButton = "";
+let harlemButton = "";
+let bronxButton = "";
+let brooklynButton = "";
+let queensButton = "";
+
+//define drug buy and sell button placeholders
+let cannabisBuy = "";
+let cannabisSell = "";
+let shroomsBuy = "";
+let shroomsSells = "";
+
+//define drug price info placeholders
+let cannabisInfo = "";
+let shroomsInfo = "";
+
+
+
+let drugListInitialized = false;
+
 
 const welcomeMessage = `<p>Oh, man. <br/><br/>The county tax assessor 
 says Grandma is gonna lose the house. 
@@ -58,7 +141,7 @@ You are flat broke.
 <br /><br />
 So, your cousin Pauly from Jersey introduces you to his "friend" Tony.
 <br /><br />
-Tony "generously" gives you a $5,000 loan.
+Tony "generously" gives you a $2,500 loan.
 <br /><br />
 Tony says he's a reasonable guy, so he's only charging ${interestRate}% interest per day.
 <br /><br />
@@ -67,29 +150,6 @@ With a big slap on the back, Tony says his guys will come find you in a week to 
 
 </p>`
 
-let statusMessage = "";
-
-
-let burroughs = {}; //this is an object that will contain additional info about each location e.g. services,  etc
-
-//define player stats placeholders
-let cash = 0;
-let debt = 0;
-let health = 0;
-let maxHealth = 0;
-let stashSize = 0;
-let countHeld = 0;
-let day = 0;
-
-//define travel button placeholders
-let manhattanButton = "";
-let harlemButton = "";
-let bronxButton = "";
-let brooklynButton = "";
-let queensButton = "";
-
-let cannabisPrice = 0;
-const cannabisPriceUI = document.querySelector("#cannabis-price")
 
 const printWelcomeMessage = () => {
     statusMessageHolder.innerHTML = welcomeMessage;
@@ -103,8 +163,14 @@ const loadObjectsJSON = async() => {
         const objects = await response.json();
 
         burroughs = objects.locations; //grab the location objects from the objects master list
+        drugs = objects.drugs;
+        inventory = objects.playerInfo.inventory;
 
+        console.log(inventory);
         console.log(burroughs)
+        console.log(drugs)
+
+        console.log(inventory);
 
         burroughs.forEach(burrough => {
             console.log("Createing Travel Button for: " + burrough.name)
@@ -121,7 +187,7 @@ const loadObjectsJSON = async() => {
         debt = objects.playerInfo.debt;
         health = objects.playerInfo.maxHealth;
         maxHealth = objects.playerInfo.maxHealth;
-        stashSize = objects.playerInfo.stashSize;
+        maxStash = objects.playerInfo.maxStash;
         
              
     } catch (error) {
@@ -184,10 +250,8 @@ const travelClick = destination => {
     updateInfoPanelStats();
     listAvailableActivities();
     randomizeDrugPrices();
-
+    showDealPanel(); //bring up the deal panel after a the player travels to a new burrough
 }
-
-
 
 
 //game start button click
@@ -224,7 +288,7 @@ const updateInfoPanelStats = () => {
     cashUI.textContent = `$${cash}`;
     debtUI.textContent = `$${debt.toFixed(2)}`;
     healthUI.textContent = `${health} / ${maxHealth}`;
-    stashUI.textContent = `${countHeld} / ${stashSize}`;
+    stashUI.textContent = `${countHeld} / ${maxStash}`;
     console.log("UI values updated");
 
 }
@@ -262,52 +326,125 @@ const listAvailableActivities = () => {
 }
 
 
-//handle activity button clicks
-
-travelActivityButton.addEventListener("click", event => {
-    console.log("travel button clicked");
-    hideAllActionPanels();
-    travelPanel.classList.remove("hide");
-
-})
-dealActivityButton.addEventListener("click", event => {
-    console.log("deal button clicked");
-    hideAllActionPanels();
-    dealPanel.classList.remove("hide");
-})
-loanActivityButton.addEventListener("click", event => {
-    console.log("loan button clicked");
-    hideAllActionPanels();
-    loanPanel.classList.remove("hide");
-})
-bankActivityButton.addEventListener("click", event => {
-    console.log("bank button clicked");
-    hideAllActionPanels();
-    bankPanel.classList.remove("hide");
-})
-
-const hideAllActionPanels = () => {
-    activityPanels.forEach(panel => {
-        panel.classList.add("hide")
-    })
-}
-
 const randomizeDrugPrices = () => {
     console.log("randomizing drug prices");
-    let rnd = Random.int(50, 500)
+    
+    //you've got an array called drugs
+    drugs.forEach(drug => {
+        //randomize the price of each drug in that array based on the min and max price parameters found in objects.json
+        drug.sellPrice = Random.int(drug.minPrice, drug.maxPrice) //randomize the sell price
+        drug.buyPrice = (drug.sellPrice * 1.1); //calculate a buy price that's a bit more expensive
+        drug.buyPrice = parseFloat(drug.buyPrice.toFixed(0)); //get rid of the digits after the decimal for the buy price
+        console.log(drug.name + " " + drug.sellPrice)
+    })
 
-    cannabisPrice = rnd;
-    console.log("Rand: " + cannabisPrice);
+    if (!drugListInitialized) {
+        initializeDrugList();
+    } else {
+        //a method to update the drug prices each day
+        printDrugPrices();
+    }
+    
+}
 
 
-    printDrugPrices();
+//run this code only once. It will create the list of drugs adn attach listeners to the buttons on that list
+const initializeDrugList= () => {
+    
+    drugs.forEach(drug => {
+        //create HTML for each drug that somehow includes buttons with listeners
+        
+        dealButtonHolder.insertAdjacentHTML("beforeend",
+            `<div id="${drug.name}-deal" class="drug-deal">
+                <div id="${drug.id}-buy" class="button">Buy</div>
+                <div id=${drug.name}-price class="drug-listing"><h3>$${drug.buyPrice}</h3><h3> ${drug.name}</h3><h3> $${drug.sellPrice}</h3></div>
+                <div id="${drug.id}-sell" class="button">Sell</div>
+            </div>`);
+
+    })
+
+    //attach listeners sbuy and sell buttons for each drug
+    cannabisBuy = document.querySelector("#cannabis-deal-buy");
+    cannabisBuy.addEventListener("click", event => {
+        console.log("buy cannabis!")
+        buyDrug(0); //the integer we pass into buyDrugs must be equal to the index value of the relevant drug in the drugs array (which is, in turn, taken from the objects.json)
+    })
+
+    cannabisSell = document.querySelector("#cannabis-deal-sell");
+    cannabisSell.addEventListener("click", event => {
+        console.log("sell cannabis!")
+        sellDrug(0);
+    })
+    
+    shroomsBuy = document.querySelector("#shrooms-deal-buy");
+    shroomsBuy.addEventListener("click", event => {
+        console.log("buy shrooms!")
+        buyDrug(1);
+    })
+
+    shroomsSells = document.querySelector("#shrooms-deal-sell");
+    shroomsSells.addEventListener("click", event => {
+        console.log("sell shrooms!")
+        sellDrug(1);
+    })
+
+    cannabisInfo = document.querySelector("#Cannabis-price");
+    shroomsInfo = document.querySelector("#Shrooms-price");
+
+
+    drugListInitialized = true;
 }
 
 const printDrugPrices = () => {
-    cannabisPriceUI.textContent = `$${cannabisPrice}`
+    let drugInfoArray = [cannabisInfo, shroomsInfo];
+    let index = 0;
+    drugInfoArray.forEach(entry => {
+        console.log("here we go now")
+        console.log(entry.innerHTML)
+        entry.innerHTML = `<h3>$${drugs[index].buyPrice}</h3><h3> ${drugs[index].name}</h3><h3> $${drugs[index].sellPrice}</h3>`
+        index++;
+    })
+
+    //cannabisInfo.innerHTML = `<h3>$${drugs[0].buyPrice}</h3><h3> ${drugs[0].name}</h3><h3> $${drugs[0].sellPrice}</h3>`
+
+}
+
+const buyDrug = drugIndex => {
+
+    let currentPrice = drugs[drugIndex].buyPrice;
+    let name = drugs[drugIndex].name.toLowerCase();
+
+    console.log("Player is trying to buy " + name + " for " + currentPrice)
+    if (cash > currentPrice && countHeld < maxStash) {
+        console.log("buying!");
+        inventory[name]++;
+        countHeld++;
+        cash -= currentPrice;
+        console.log(inventory);
+        updateInfoPanelStats();
+    }
+    
+}
+
+const sellDrug = drugIndex => {
+    let currentPrice = drugs[drugIndex].sellPrice;
+    let name = drugs[drugIndex].name.toLowerCase();
+
+    console.log("Player is trying to sell " + name + " for " + currentPrice)
+    if (inventory[name] > 0) {
+        console.log("selling " + name)
+        inventory[name]--;
+        countHeld--;
+        cash += currentPrice;
+        updateInfoPanelStats();
+    } else {
+        console.error("no more " + name + " in inventory")
+    }
+
 }
 
 //this logic runs on page load
-printWelcomeMessage(); //put the intro message on the screen
 loadObjectsJSON(); //and load the JSON objects for things like locations
+printWelcomeMessage(); //put the intro message on the screen
+
 

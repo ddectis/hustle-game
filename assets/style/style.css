@@ -53,7 +53,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    justify-content: space-evenly;
+    justify-content: flex-start;
     align-items:center;
 }
 
@@ -201,9 +201,15 @@ a{
 .drug-deal {
     outline: 3px double #6cda82;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
 }
+
+.drug-listing {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 55%;
 }
 
 @media screen and (min-width: 600px) {
