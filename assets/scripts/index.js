@@ -827,3 +827,9 @@ printWelcomeMessage(); //put the intro message on the screen
 //add placeholder entries at the top
 //add entries in "initializeDrugList"
 //add json info - both in the drug category and then again in the inventory (you should probably generate the inventory dynamically based on a forEach of the names of the drugs in the drug list)
+
+//TODO:
+//improve the layout on narrow screens :(
+//Add a chance to get mugged and lose some health, money, and drugs
+//Add a bank where you can deposit funds to keep them safe from being mugged
+//Add the county office where you can pay off the loan on grandma's house
