@@ -25,7 +25,9 @@ const activityButtons = [travelActivityButton,dealActivityButton,loanActivityBut
 //these holders are used to hold programmatically generated html i.e. a bunch of buttons
 const travelButtonHolder = document.querySelector("#travel-buttons");
 const dealButtonHolder = document.querySelector("#deal-buttons");
+const activityButtonHolder = document.querySelector("#activity-buttons");
 
+//this holds the name of the burrough in the activities panel (the one with buttons to indicate which activies are available in each burrough)
 const activitiesInInfo = document.querySelector("#activities-in");
 
 
@@ -304,8 +306,6 @@ gameStartButton.addEventListener("click", event => {
     console.log("start button clicked");
     statusMessageHolder.innerHTML = introMessage;
 
-
-
     continueFromIntroButton.classList.remove("hide")
 
     gameStartButton.classList.add("hide")
@@ -341,6 +341,9 @@ const updateInfoPanelStats = () => {
 
 const updateStatusMessage = () => {
     statusMessage = `<p>It is Day ${day}.</p>`
+    if (debt > 0) {
+        statusMessage += `<br/><p>Tony expects full payment by Day ${dayOfUpsidedness}</p>`
+    }
     statusMessageHolder.innerHTML = statusMessage;
 }
 
@@ -643,7 +646,8 @@ const lookForYou = () => {
         }); 
     }, 0)
 
-    let lookingString = `<p>You are in ${burroughs[currentLocation].name}.</p>`;
+    let lookingString = ``;
+    let locationString = `<p>You are in ${burroughs[currentLocation].name}.</p>`;
     let found = false;
 
     for (let lookAttempt = 0; lookAttempt < lookAttempts; lookAttempt++) {
@@ -659,7 +663,7 @@ const lookForYou = () => {
             
         } else {
             console.error("Sal found you. Uh oh.")
-            lookingString += `<br/><br/><p>Uh oh...</p><br/><br/>`
+            lookingString += `<br/>${locationString}<br/><br/><p>Uh oh...</p><br/><br/>`
             found = true;
             break //and we stop the execution of the loop
         }
@@ -669,7 +673,7 @@ const lookForYou = () => {
     }
 
     if (found === false) {
-        lookingString += `<br/><p>You managed to avoid Sal!</p>`;
+        lookingString += `${locationString}<br/><p>You managed to avoid Sal!</p>`;
     } else {
         goUpsideYourHead(); //player has been caught by the mob enforcer while late on loan payment. Player gets punishsed
     }
@@ -689,18 +693,61 @@ const lookForYou = () => {
 //this is what happens when Sal finds you and you're late on loan payment
 const goUpsideYourHead = () => {
 
+    activityButtonHolder.classList.add("hide"); //hide the activities panel to ensure the player reads the Upside Your Head panel and understands that they took damage.
+                                                //this also allows the player to see the screen that has the info that killed them prior to taking them to the "you died" screen
     //make sure this happens only once the stack is clear. This feels like an abusive and wrong way to use this. Is that right? Let me know: dandectis@gmail.com lol
     setTimeout(() => {
         console.error("ouch!")
-        const means = ["tire iron", "5 iron", "baseball bat", "brass knuckes", "size 13 boots"]
+        const means = ["a tire iron", "a 5 iron", "a baseball bat", "these brass knuckes", "my size 13 boots"]
         let rnd = Random.int(0, means.length - 1);
         console.log(means[rnd] + " Rnd: " + rnd)
-        let upsideHead = `<p>Sorry, kid," Sal says, "But Tony expects his money. So I'm gonna have to go upside your head with a ${means[rnd]} now. Nothing personal.</p>`
+        let upsideHead = `
+            <p>Sorry, kid," Sal says, "But Tony expects his money. So I'm gonna have to go upside your head with ${means[rnd]} now. Nothing personal.</p><br/>
+            <div id="continue-after-mob-hit" class="button" >"Ouch!" (-55 health) <br/>"Was that really necessary, man?" (continue)</div>`
+
+        health -= 55;
+        
+        updateInfoPanelStats();
+
         console.log(upsideHead);
         lookingForYouPanel.innerHTML += upsideHead;
+
+        //the player will need to click the continue button in order to proceed away from this screen.
+        const continueButton = document.querySelector("#continue-after-mob-hit");
+        continueButton.addEventListener("click", () => {
+            checkHealth(); //we check to see if the player has died before moving on
+
+            //and turn the activity buttons back on if the player has not died
+            i
+        })
     },0)
     
 
+}
+
+const checkHealth = () => {
+    if (health <= 0) {
+        //hide the UI Info Panel
+        infoPanel.classList.add("hide");
+        //as well as the UI Action Panel
+        actionPanel.classList.add("hide");
+        dealPanel.classList.add("hide");
+        statusMessageHolder.innerHTML = `
+            <p>You died on day ${day}. Tough luck.</p>
+            <div id="restart-game" class="button">Play Again</div> 
+            `
+        //grab a reference to the button you just created and then add a listener to make it refresh the page on click. This is my kludgy shortcut to starting a new game :)
+        const playAgainButton = document.querySelector("#restart-game");
+        playAgainButton.addEventListener("click", () => {
+            location.reload(); //reload the page as a shortcut to starting a new game
+        })
+
+    }
+
+    if (health > 0) {
+        activityButtonHolder.classList.remove("hide");
+        lookingForYouPanel.classList.add("hide");
+    }
 }
 
 //this logic runs on page load
