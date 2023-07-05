@@ -133,6 +133,11 @@ let cannabisInfo = "";
 let shroomsInfo = "";
 let boozeInfo = "";
 
+//define drug holding placeholders for the deals panel
+let cannabisCountElement = "";
+let shroomsCountElement = "";
+let boozeCountElement = "";
+
 
 
 let drugListInitialized = false;
@@ -376,7 +381,7 @@ const initializeDrugList= () => {
         dealButtonHolder.insertAdjacentHTML("beforeend",
             `<div id="${drug.name}-deal" class="drug-deal">
                 <div id="${drug.id}-buy" class="button">Buy</div>
-                <div id=${drug.name}-price class="drug-listing"><h3>$${drug.buyPrice}</h3><h3> ${drug.name}</h3><h3> $${drug.sellPrice}</h3></div>
+                <div id=${drug.name}-price class="drug-listing"><h3>$${drug.buyPrice}</h3><h3 class="drug-name"> ${drug.name}</h3><div class="flex"><h3>Holding: </h3><h3 id="${drug.id}-held">0</h3></div><h3>$${drug.sellPrice}</h3></div>
                 <div id="${drug.id}-sell" class="button">Sell</div>
             </div>`);
 
@@ -424,24 +429,35 @@ const initializeDrugList= () => {
     shroomsInfo = document.querySelector("#Shrooms-price");
     boozeInfo = document.querySelector("#Bootleg");
 
+    cannabisCountElement = document.querySelector("#cannabis-deal-held");
+    shroomsCountElement = document.querySelector("#shrooms-deal-held");
+    boozeCountElement = document.querySelector("#booze-deal-held")
+    console.log("Cannabis Count: " + cannabisCountElement.textContent);
+
 
     drugListInitialized = true;
 }
 
+//also print the inventory count for each drug
 const printDrugPrices = () => {
     let drugInfoArray = [cannabisInfo, shroomsInfo, boozeInfo];
     let index = 0;
+    
+    
     drugInfoArray.forEach(entry => {
-        console.log("here we go now")
-        console.log(entry.innerHTML)
-        entry.innerHTML = `<h3>$${drugs[index].buyPrice}</h3><h3> ${drugs[index].name}</h3><h3> $${drugs[index].sellPrice}</h3>`
+        let name = drugs[index].name.toLowerCase();
+        console.log("here we go now with " + name);
+        entry.innerHTML = `<h3>$${drugs[index].buyPrice}</h3><h3 class="drug-name"> ${drugs[index].name}</h3><div class="flex"><h3>Holding: </h3><h3 id="${drugs[index].id}-held">${inventory[name].count}</h3></div><h3> $${drugs[index].sellPrice}</h3>`
+
+            
         index++;
     })
-
-    //cannabisInfo.innerHTML = `<h3>$${drugs[0].buyPrice}</h3><h3> ${drugs[0].name}</h3><h3> $${drugs[0].sellPrice}</h3>`
+    index = 0;
+    
 
 }
 
+//take in an index value to match to the drugs array and then handle the logic to buy one unit of a drug
 const buyDrug = drugIndex => {
 
     let index = drugIndex;
@@ -449,6 +465,8 @@ const buyDrug = drugIndex => {
     let name = drugs[drugIndex].name.toLowerCase();
 
     console.log("Player is trying to buy " + name + " for " + currentPrice)
+
+    //check to see if the player has the money and space to buy another unit
     if (cash > currentPrice && countHeld < maxStash) {
         console.log("buying!");
         //add 1 unit of the relevant drug to the inventory and calculate the unit price
@@ -459,9 +477,11 @@ const buyDrug = drugIndex => {
         cash -= currentPrice;
         console.log(inventory);
         updateInfoPanelStats();
-        //move maximum possible tries to buy / sell the max amount permitted by cash or by inventory
+        printDrugPrices();
+
+        //"move maximum possible" tries to buy / sell the max amount permitted by cash or by inventory
         if (moveMaximumPossible) {
-            buyDrug(index);
+            buyDrug(index); //so run this method again
         } 
     } else {
         console.error("insufficient funds or capacity to buy another unit of " + name)
@@ -469,6 +489,7 @@ const buyDrug = drugIndex => {
     
 }
 
+//take in an index value to match to the drugs array and then handle the logic to sell one unit of a drug. Uses the same pattern as buyDrug
 const sellDrug = drugIndex => {
     let index = drugIndex;
     let currentPrice = drugs[drugIndex].sellPrice;
@@ -489,6 +510,7 @@ const sellDrug = drugIndex => {
         cash += currentPrice;
         console.log(inventory);
         updateInfoPanelStats();
+        printDrugPrices();
         if (moveMaximumPossible) {
             sellDrug(index);
         }

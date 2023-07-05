@@ -43,6 +43,7 @@ h2{
 
 h3{
     text-align:center;
+    padding-inline: 5px;
 }
 
 p{
@@ -214,6 +215,10 @@ a{
     width: 55%;
 }
 
+.drug-name{
+    width:50%;
+}
+
 .horizontal {
     display: flex;
     align-items: center;
@@ -226,6 +231,10 @@ a{
 
 .hide {
     display: none
+}
+
+.flex{
+    display:flex;
 }
 
 @media screen and (min-width: 600px) {
