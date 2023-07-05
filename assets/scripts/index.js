@@ -20,7 +20,7 @@ const viewStashButton = document.querySelector("#activity-stash")
 
 const activityButtons = [travelActivityButton,dealActivityButton,loanActivityButton,bankActivityButton]
 
-console.log("Bank: " + bankActivityButton)
+
 
 //these holders are used to hold programmatically generated html i.e. a bunch of buttons
 const travelButtonHolder = document.querySelector("#travel-buttons");
@@ -29,14 +29,20 @@ const dealButtonHolder = document.querySelector("#deal-buttons");
 const activitiesInInfo = document.querySelector("#activities-in");
 
 
-//create references fo all of the different action screens
+//create references fo all of the different action screens that the player can activate
 const travelPanel = document.querySelector("#travel-panel");
 const dealPanel = document.querySelector("#deal-panel");
 const loanPanel = document.querySelector("#loan-panel");
 const bankPanel = document.querySelector("#bank-panel");
 const stashPanel = document.querySelector("#stash-panel");
 
+//this array refers to each of the panels. This is used to show / hide each panel on button clicks
+//this array deliberately doesn't contain the lookingForYouPanel because that panel is handled differently i.e. it is triggered by game conditions and not from the player's actions
+//i.e. this array contains all of the panels that the player can choose to activate. Panels which aren't activated by the player should not be placed in this array
 const activityPanels = [travelPanel, dealPanel, loanPanel, bankPanel, stashPanel];
+
+//create references to action screens that the player cannot activate i.e. that trigger from game states
+const lookingForYouPanel = document.querySelector("#looking-for-you-panel")
 
 const moveMaximumPossibleToggle = document.querySelector("#moveMaximumProduct");
 let moveMaximumPossible = false;
@@ -51,28 +57,33 @@ travelActivityButton.addEventListener("click", event => {
     console.log("travel button clicked");
     hideAllActionPanels();
     travelPanel.classList.remove("hide");
+    lookingForYouPanel.classList.add("hide");
 
 })
 dealActivityButton.addEventListener("click", event => {
     console.log("deal button clicked");
     showDealPanel();    
+    lookingForYouPanel.classList.add("hide");
 })
 loanActivityButton.addEventListener("click", event => {
     console.log("loan button clicked");
     visitTony();
     hideAllActionPanels();
     loanPanel.classList.remove("hide");
+    lookingForYouPanel.classList.add("hide");
 })
 bankActivityButton.addEventListener("click", event => {
     console.log("bank button clicked");
     hideAllActionPanels();
     bankPanel.classList.remove("hide");
+    lookingForYouPanel.classList.add("hide");
 })
 viewStashButton.addEventListener("click", event => {
     console.log("stash button clicked");
     printInventory();
     hideAllActionPanels();
     stashPanel.classList.remove("hide");
+    lookingForYouPanel.classList.add("hide");
 })
 
 const showDealPanel = () => {
@@ -233,31 +244,32 @@ const loadObjectsJSON = async() => {
 const createTravelButtons = () => {
     manhattanButton = document.querySelector("#manhattan-button")
     manhattanButton.addEventListener("click", event => {
+        console.log("Manhattan click");
         travelClick(0);
-        console.log("Manhattan click")
     })
     harlemButton = document.querySelector("#harlem-button")
     harlemButton.addEventListener("click", event => {
-        travelClick(1);
         console.log("Harlem Click");
+        travelClick(1);
     })
 
     bronxButton = document.querySelector("#bronx-button");
     bronxButton.addEventListener("click", event => {
+        console.log("Bronx Click");
         travelClick(2);
-        console.log("Bronx Click")
     })
 
     brooklynButton = document.querySelector("#brooklyn-button");
     brooklynButton.addEventListener("click", event => {
-        travelClick(3)
-        console.log("Brooklyn Click")
+        console.log("Brooklyn Click");
+        travelClick(3);
     })
 
     queensButton = document.querySelector("#queens-button");
     queensButton.addEventListener("click", event => {
-        travelClick(4);
         console.log("Queens Click")
+        travelClick(4);
+        
     })
 
     console.log("travel button listeners added")
@@ -619,31 +631,76 @@ He says, "Tony'll be real glad you came by to pay him his money. And I'm glad be
 
 //this is where Sal is looking for you because you are late on your loan payment
 const lookForYou = () => {
-    console.log("Sal is looking")
-    let lookAttempts = Math.abs(dayOfUpsidedness - day)
-    console.log("Attempts: " + lookAttempts);
+    let lookAttempts = Math.abs(dayOfUpsidedness - day) //look attempts increase day by day
+    console.log("Sal the enforcer is looking for the player. Attempts: " + lookAttempts);
+    lookingForYouPanel.innerHTML = ""; //initialize with an empty panel because below we're going to += a bunch of js
+
+    //wait until the event loop is empty and then call this (i.e. timeout = 0). This ensures that the logic that handles the display / hiding of the different panels on travel click don't get in the way of hiding all and then showing the "Sal's looking for you" screen
+    setTimeout(() => {
+        activityPanels.forEach(panel => {
+            console.log("looking for you so hiding all the panels")
+            panel.classList.add("hide");
+        }); 
+    }, 0)
+
+    let lookingString = `<p>You are in ${burroughs[currentLocation].name}.</p>`;
+    let found = false;
 
     for (let lookAttempt = 0; lookAttempt < lookAttempts; lookAttempt++) {
         console.log("This is attempt #" + lookAttempt);
         //make a random int to represent the burrough that Sal will look in
-        let burroughRND = Random.int(0, burroughs.length);
+        let burroughRND = Random.int(0, burroughs.length - 1);
+        console.log("Burrough: " + burroughRND + " Current: " + currentLocation)
         console.log(`Sal Looked in ${burroughs[burroughRND].name}. You are in ${burroughs[currentLocation].name}`)
-
+        lookingString += `<p>Sal Looked in ${burroughs[burroughRND].name}.</p>`
         //if that is also the burrough that the player is in, the player will be punished. If not, the player eludes Sal
         if (burroughRND !== currentLocation) {
-            console.log("You managed to avoid Sal!")
+            console.log("You managed to avoid Sal so far...")
+            
         } else {
             console.error("Sal found you. Uh oh.")
-            goUpsideYourHead(); //player has been caught by the mob enforcer while late on loan payment. Player gets punishsed
-            return //and we stop the execution of the loop
+            lookingString += `<br/><br/><p>Uh oh...</p><br/><br/>`
+            found = true;
+            break //and we stop the execution of the loop
         }
+
+        
+
     }
+
+    if (found === false) {
+        lookingString += `<br/><p>You managed to avoid Sal!</p>`;
+    } else {
+        goUpsideYourHead(); //player has been caught by the mob enforcer while late on loan payment. Player gets punishsed
+    }
+
+    let baseString = `
+            <p>Tony expects his money. You're late.</p><br/>
+            <p>Sal's been lookin' for ya.</p><br/>`;
+
+    let finalString = baseString + lookingString;
+    lookingForYouPanel.innerHTML += finalString;
+
+    console.log("printing final string")
+    lookingForYouPanel.classList.remove("hide");
     
 }
 
 //this is what happens when Sal finds you and you're late on loan payment
 const goUpsideYourHead = () => {
-    console.error("ouch!")
+
+    //make sure this happens only once the stack is clear. This feels like an abusive and wrong way to use this. Is that right? Let me know: dandectis@gmail.com lol
+    setTimeout(() => {
+        console.error("ouch!")
+        const means = ["tire iron", "5 iron", "baseball bat", "brass knuckes", "size 13 boots"]
+        let rnd = Random.int(0, means.length - 1);
+        console.log(means[rnd] + " Rnd: " + rnd)
+        let upsideHead = `<p>Sorry, kid," Sal says, "But Tony expects his money. So I'm gonna have to go upside your head with a ${means[rnd]} now. Nothing personal.</p>`
+        console.log(upsideHead);
+        lookingForYouPanel.innerHTML += upsideHead;
+    },0)
+    
+
 }
 
 //this logic runs on page load
