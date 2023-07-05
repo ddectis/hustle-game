@@ -59,6 +59,7 @@ dealActivityButton.addEventListener("click", event => {
 })
 loanActivityButton.addEventListener("click", event => {
     console.log("loan button clicked");
+    visitTony();
     hideAllActionPanels();
     loanPanel.classList.remove("hide");
 })
@@ -100,7 +101,7 @@ let currentLocation = 0; //this is an array index value that connects to "locati
 let statusMessage = "";
 
 
-let burroughs = {}; //this is an object that will contain additional info about each location e.g. services,  etc
+let burroughs = []; //this is an object that will contain additional info about each location e.g. services,  etc
 let drugs = {};
 let inventory = {};
 
@@ -112,6 +113,7 @@ let maxHealth = 0;
 let maxStash = 0;
 let countHeld = 0;
 let day = 0;
+let dayOfUpsidedness = 1; //this is the day when tony's goons come find you
 
 //define travel button placeholders
 let manhattanButton = "";
@@ -140,6 +142,10 @@ let boozeCountElement = "";
 
 //define a place to print the stash info
 const stashInfoHolder = document.querySelector("#stash-info");
+
+//define a place to print loanshark info
+const loanInfoHolder = document.querySelector("#loan-info")
+
 
 
 let drugListInitialized = false;
@@ -259,6 +265,7 @@ const createTravelButtons = () => {
 
 }
 
+//travel between burroughs. Also progresses time and checks loan status
 const travelClick = destination => {
     console.log("Traveling to : " + burroughs[destination].name);
     currentLocation = destination;
@@ -272,6 +279,10 @@ const travelClick = destination => {
     updateInfoPanelStats();
     listAvailableActivities();
     randomizeDrugPrices();
+    if (debt > 0 && day > dayOfUpsidedness) {
+        console.error("Tony's loan is overdue!! Sal is looking for you")
+        lookForYou();
+    }
     showDealPanel(); //bring up the deal panel after a the player travels to a new burrough
 }
 
@@ -382,7 +393,7 @@ const initializeDrugList= () => {
         //the inner portion (with ${drug.name}) is then overwritten in printDrugPrices() which is called at the end of this method
         dealButtonHolder.insertAdjacentHTML("beforeend",
             `<div id="${drug.name}-deal" class="drug-deal">
-                <h2 class="drug-name"> ${drug.name}</h3>
+                <h4 class="drug-name"> ${drug.name}</h3>
                 <div class="flex width-100">
                     <div id="${drug.id}-buy" class="button height-50">Buy</div>
                     <div id=${drug.name}-price class="drug-listing width-100"><div class="flex"><h3>$${drug.buyPrice}</h3><div class="flex"></div><h3>$${drug.sellPrice}</h3></div><h3>Holding: </h3><h3 id="${drug.id}-held">0</h3></div>
@@ -545,6 +556,94 @@ const printInventory = () => {
             </div>`)
         i++;
     }
+}
+
+const visitTony = () => {
+    console.log("Generating Tony's Info");
+    let loanDaysRemaining = dayOfUpsidedness - day;
+    let dayOrDays = "";
+    if (loanDaysRemaining > 1 || loanDaysRemaining === 0) {
+        dayOrDays = "days"
+    } else {
+        dayOrDays = "day"
+    }
+
+    
+
+    loanInfoHolder.innerHTML =
+        `<div class="loan-holder">
+            <h3>Tony expects payment in ${loanDaysRemaining} ${dayOrDays}</h3>
+            <h3>Debt: $${debt}</h3>
+            <br />
+            <div id="pay-500" class="button">Pay $500</div>
+        </div>
+        `
+
+    let pay500Button = document.querySelector("#pay-500");
+    pay500Button.addEventListener("click", () => {
+        payDebt();
+    })
+
+}
+
+const payDebt = () => {
+
+    //check debt levels and subtract 500 if > 500 remaining, or subtract remaining if not
+    if (debt >= 500 && cash >= 500) {
+        debt -= 500;
+        cash -= 500;
+    } else if (debt < 500 && debt > 0) {
+        debt -= debt;
+        cash -= debt;
+    } else if (debt < 0) {
+        console.error("no debt left to pay, numbskull!")        
+    }
+
+    
+
+    let yet = "";
+    
+    if (debt > 0) {
+        yet = "...yet";
+    } else {
+        yet = "";
+    }
+    let paymentMessage = `<p>Sal behind the bar takes the envelope containing your money. 
+
+He says, "Tony'll be real glad you came by to pay him his money. And I'm glad because that means I don't gotta go upside your head${yet}"</p>`
+    console.log(paymentMessage);
+    updateInfoPanelStats();
+    visitTony();
+
+}
+
+//this is where Sal is looking for you because you are late on your loan payment
+const lookForYou = () => {
+    console.log("Sal is looking")
+    let lookAttempts = Math.abs(dayOfUpsidedness - day)
+    console.log("Attempts: " + lookAttempts);
+
+    for (let lookAttempt = 0; lookAttempt < lookAttempts; lookAttempt++) {
+        console.log("This is attempt #" + lookAttempt);
+        //make a random int to represent the burrough that Sal will look in
+        let burroughRND = Random.int(0, burroughs.length);
+        console.log(`Sal Looked in ${burroughs[burroughRND].name}. You are in ${burroughs[currentLocation].name}`)
+
+        //if that is also the burrough that the player is in, the player will be punished. If not, the player eludes Sal
+        if (burroughRND !== currentLocation) {
+            console.log("You managed to avoid Sal!")
+        } else {
+            console.error("Sal found you. Uh oh.")
+            goUpsideYourHead(); //player has been caught by the mob enforcer while late on loan payment. Player gets punishsed
+            return //and we stop the execution of the loop
+        }
+    }
+    
+}
+
+//this is what happens when Sal finds you and you're late on loan payment
+const goUpsideYourHead = () => {
+    console.error("ouch!")
 }
 
 //this logic runs on page load
