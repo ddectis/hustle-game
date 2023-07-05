@@ -138,6 +138,8 @@ let cannabisCountElement = "";
 let shroomsCountElement = "";
 let boozeCountElement = "";
 
+//define a place to print the stash info
+const stashInfoHolder = document.querySelector("#stash-info");
 
 
 let drugListInitialized = false;
@@ -376,13 +378,16 @@ const randomizeDrugPrices = () => {
 const initializeDrugList= () => {
     
     drugs.forEach(drug => {
-        //create HTML for each drug that somehow includes buttons with listeners
-        
+        //creates an HTML template for each drug. Creates everything here so that listeners can then be attached
+        //the inner portion (with ${drug.name}) is then overwritten in printDrugPrices() which is called at the end of this method
         dealButtonHolder.insertAdjacentHTML("beforeend",
             `<div id="${drug.name}-deal" class="drug-deal">
-                <div id="${drug.id}-buy" class="button">Buy</div>
-                <div id=${drug.name}-price class="drug-listing"><h3>$${drug.buyPrice}</h3><h3 class="drug-name"> ${drug.name}</h3><div class="flex"><h3>Holding: </h3><h3 id="${drug.id}-held">0</h3></div><h3>$${drug.sellPrice}</h3></div>
-                <div id="${drug.id}-sell" class="button">Sell</div>
+                <h2 class="drug-name"> ${drug.name}</h3>
+                <div class="flex width-100">
+                    <div id="${drug.id}-buy" class="button height-50">Buy</div>
+                    <div id=${drug.name}-price class="drug-listing width-100"><div class="flex"><h3>$${drug.buyPrice}</h3><div class="flex"></div><h3>$${drug.sellPrice}</h3></div><h3>Holding: </h3><h3 id="${drug.id}-held">0</h3></div>
+                    <div id="${drug.id}-sell" class="button height-50">Sell</div>
+                </div>
             </div>`);
 
     })
@@ -434,7 +439,7 @@ const initializeDrugList= () => {
     boozeCountElement = document.querySelector("#booze-deal-held")
     console.log("Cannabis Count: " + cannabisCountElement.textContent);
 
-
+    printDrugPrices();
     drugListInitialized = true;
 }
 
@@ -447,7 +452,9 @@ const printDrugPrices = () => {
     drugInfoArray.forEach(entry => {
         let name = drugs[index].name.toLowerCase();
         console.log("here we go now with " + name);
-        entry.innerHTML = `<h3>$${drugs[index].buyPrice}</h3><h3 class="drug-name"> ${drugs[index].name}</h3><div class="flex"><h3>Holding: </h3><h3 id="${drugs[index].id}-held">${inventory[name].count}</h3></div><h3> $${drugs[index].sellPrice}</h3>`
+        entry.innerHTML = `
+            <div class="flex justify-content-space-between width-100"><h3>$${drugs[index].buyPrice}</h3><h3>  $${drugs[index].sellPrice}</h3></div>
+            <div class="flex"><h3>Holding: </h3><h3 id="${drugs[index].id}-held" class="min-width">${inventory[name].count} @ $${inventory[name].average}</h3></div>`
 
             
         index++;
@@ -520,10 +527,23 @@ const sellDrug = drugIndex => {
 
 }
 
+//print the stash details
 const printInventory = () => {
     console.log("Printing Inventory");
+    stashInfoHolder.innerHTML = "";
+    let i = 0;
     for (const key in inventory) {
-        console.log(key + ": " + inventory[key])
+        console.log(key + ": " + inventory[key].count)
+        stashInfoHolder.insertAdjacentHTML("beforeend",
+            `<div class="stash-card">
+                <h3 class="drug-name">${drugs[i].name}</h3>
+                <div class="flex column align-items-flex-end">
+                    <h3>Holding: ${inventory[key].count}</h3>
+                    <h3>Avg: $${inventory[key].average}</h3>
+                </div>
+
+            </div>`)
+        i++;
     }
 }
 

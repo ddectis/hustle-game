@@ -44,11 +44,12 @@ h2{
 h3{
     text-align:center;
     padding-inline: 5px;
+   
 }
 
 p{
     text-align:center;
-    font-size:1.33em;
+    font-size:1.15em;
 }
 
 body {
@@ -95,15 +96,18 @@ body {
 
 .button {
     border: solid 2px #6cda82;
-    padding-inline: 15px;
+    padding-inline: 1%;
     padding-block: 5px;
     border-radius: 5px;
     text-align: center;
     background-color: #6cda82;
     color: #252525;
-    font-weight:bold;
+    font-weight: bold;
     text-decoration: underline;
-    margin:5px;
+    margin: 5px;
+    display: flex;
+    align-items: center;
+}
 }
 
 .button:hover{
@@ -113,7 +117,7 @@ body {
 
 .footer{
     font-size:0.75em;
-    
+    text-align:center;
     margin-block:20px;
 }
 
@@ -129,7 +133,7 @@ a{
     flex-direction: column;
     align-items: center;
     min-width: 50%;
-    max-width:85%;
+    
     padding-block:10px;
 }
 
@@ -204,15 +208,20 @@ a{
 .drug-deal {
     outline: 3px double #6cda82;
     display: flex;
+    flex-direction:column;
     justify-content: space-between;
     align-items: center;
+    width:100%;
 }
 
 .drug-listing {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 55%;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 100%;
+    align-items: center;
+    height: 85px;
+
 }
 
 .drug-name{
@@ -223,19 +232,71 @@ a{
     display: flex;
     align-items: center;
     justify-content: space-evenly;
+    
 }
 
 .add-space-top{
     margin-top:20px;
 }
 
+.stash-info-holder{
+    display:flex;
+    flex-direction:column;
+}
+
+.stash-card {
+    outline: 3px double #6cda82;
+    height:50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.flex {
+    display: flex;
+}
+
+.column{
+    flex-direction:column;
+}
+
+.align-items-flex-start{
+    align-items:flex-start;
+}
+
+.align-items-flex-end {
+    align-items: flex-end;
+}
+
+.justify-content-space-around{
+    justify-content:space-around;
+}
+
+.justify-content-space-between{
+    justify-content:space-between;
+}
+
+.min-width{
+
+}
+
+.height-50{
+    height:50px;
+}
+
+.width-100{
+    width:100%;
+}
+
+.padding-bottom-4 {
+    padding-bottom: 4%;
+}
+
 .hide {
     display: none
 }
 
-.flex{
-    display:flex;
-}
+
 
 @media screen and (min-width: 600px) {
     .status {
