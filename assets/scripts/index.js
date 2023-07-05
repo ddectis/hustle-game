@@ -69,6 +69,7 @@ bankActivityButton.addEventListener("click", event => {
 })
 viewStashButton.addEventListener("click", event => {
     console.log("stash button clicked");
+    printInventory();
     hideAllActionPanels();
     stashPanel.classList.remove("hide");
 })
@@ -293,6 +294,7 @@ continueFromIntroButton.addEventListener("click", event => {
     infoPanel.classList.remove("hide");
     //as well as the UI Action Panel
     actionPanel.classList.remove("hide");
+    dealPanel.classList.remove("hide");
 
     continueFromIntroButton.classList.add("hide")
 })
@@ -449,7 +451,10 @@ const buyDrug = drugIndex => {
     console.log("Player is trying to buy " + name + " for " + currentPrice)
     if (cash > currentPrice && countHeld < maxStash) {
         console.log("buying!");
-        inventory[name]++;
+        //add 1 unit of the relevant drug to the inventory and calculate the unit price
+        inventory[name].count++;
+        inventory[name].cost += currentPrice
+        inventory[name].average = inventory[name].cost / inventory[name].count;
         countHeld++;
         cash -= currentPrice;
         console.log(inventory);
@@ -457,9 +462,9 @@ const buyDrug = drugIndex => {
         //move maximum possible tries to buy / sell the max amount permitted by cash or by inventory
         if (moveMaximumPossible) {
             buyDrug(index);
-        } else {
-            console.error("insufficient funds or capacity to buy another unit of " + name)
-        }
+        } 
+    } else {
+        console.error("insufficient funds or capacity to buy another unit of " + name)
     }
     
 }
@@ -470,11 +475,19 @@ const sellDrug = drugIndex => {
     let name = drugs[drugIndex].name.toLowerCase();
 
     console.log("Player is trying to sell " + name + " for " + currentPrice)
-    if (inventory[name] > 0) {
+    if (inventory[name].count > 0) {
         console.log("selling " + name)
-        inventory[name]--;
+        //subtract 1 unit of the relevant drug to the inventory and calculate the unit price
+        inventory[name].count--;
+        inventory[name].cost -= currentPrice
+        inventory[name].average = inventory[name].cost / inventory[name].count;
+        if (inventory[name].count === 0) {
+            inventory[name].cost = 0
+            inventory[name].average = 0;
+        }
         countHeld--;
         cash += currentPrice;
+        console.log(inventory);
         updateInfoPanelStats();
         if (moveMaximumPossible) {
             sellDrug(index);
@@ -483,6 +496,13 @@ const sellDrug = drugIndex => {
         console.error("no more " + name + " in inventory")
     }
 
+}
+
+const printInventory = () => {
+    console.log("Printing Inventory");
+    for (const key in inventory) {
+        console.log(key + ": " + inventory[key])
+    }
 }
 
 //this logic runs on page load

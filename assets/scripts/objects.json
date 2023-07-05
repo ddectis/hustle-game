@@ -60,9 +60,21 @@
     "maxHealth": 100,
     "maxStash": 100,
     "inventory": {
-      "cannabis": 0,
-      "shrooms": 0,
-      "bootleg liquor": 0
+      "cannabis": {
+        "count": 0,
+        "cost": 0,
+        "average": 0
+      },
+      "shrooms": {
+        "count": 0,
+        "cost": 0,
+        "average": 0
+      },
+      "bootleg liquor": {
+        "count": 0,
+        "cost": 0,
+        "average": 0
+      }
     } 
   },
 

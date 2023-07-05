@@ -78,8 +78,8 @@ body {
 .ui-and-status {
     display: flex;
     flex-direction: row;
-    border: 3px double;
-    max-width:97%;
+    width: 95%;
+    justify-content: center;
 }
 
 .status {
