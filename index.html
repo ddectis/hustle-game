@@ -3,7 +3,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="./assets/style/style.css?5" />
+    <link rel="stylesheet" href="./assets/style/style.css?8" />
      <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Time to Hustle</title>
     <title></title>
@@ -15,132 +15,132 @@
 
     </div>
 
+    <div class="ui-parent">
+        <div class="ui-and-status">
+            <div class="ui-holder hide" id="info-panel">
+                <h2>Info</h2>
+                <div class="stats-holder">
 
-    <div class="ui-and-status">
-        <div class="ui-holder hide" id="info-panel">
-            <h2>Info</h2>
-            <div class="stats-holder">
+                    <div class="stats-headers">
+                        <p>Cash: </p>
+                        <p>Debt: </p>
+                        <p>Health: </p>
+                        <p>Stash: </p>
 
-                <div class="stats-headers">
-                    <div>Cash: </div>
-                    <div>Debt: </div>
-                    <div>Health: </div>
-                    <div>Stash: </div>
+
+                    </div>
+                    <div class="stats-spacer"></div>
+                    <div class="stats-data">
+                        <p id="cash">$1,234</p>
+                        <p id="debt">$5,678 </p>
+                        <p id="health">100 / 100 </p>
+                        <p id="stash">85 / 100</p>
+
+
+                    </div>
 
 
                 </div>
-                <div class="stats-spacer"></div>
-                <div class="stats-data">
-                    <div id="cash">$1,234</div>
-                    <div id="debt">$5,678 </div>
-                    <div id="health">100 / 100 </div>
-                    <div id="stash">85 / 100</div>
+            </div>
 
+            <div class="ui-holder">
+                <h2 class="hide" id="status-header"></h2>
+                <div class="status" id="status-message">
 
                 </div>
-
-
             </div>
         </div>
-
-        <div class="ui-holder">
-            <h2 class="hide" id="status-header"></h2>
-            <div class="status" id="status-message">
-
-            </div>
-        </div>
-    </div>
     
         
 
-    <div class="button-holder">
-        <div class="button add-space-top" id="game-start-button"><h2>Well, shit. Let's get started</h2></div>
-        <div class="button hide add-space-top" id="continue-from-intro-button">Uhh...that sounds ominous.<br /><br /> Time to hit the streets</div>
+        <div class="button-holder">
+            <div class="button add-space-top" id="game-start-button"><h2>Well, shit. Let's get started</h2></div>
+            <div class="button hide add-space-top" id="continue-from-intro-button">Uhh...that sounds ominous.<br /><br /> Time to hit the streets</div>
 
-    </div>
-
-    <div class="actions-holder hide" id="action-panel">
-
-        <div class="actions" id="activity-buttons">
-            <h2 id="activities-in">Activities</h2>
-
-            <div class="activity-button-holder" id="activity-buttons">
-                <div class="button" id="activity-deal">Buy & Sell</div>
-                <div class="button" id="activity-travel">Travel</div>
-                <div class="button" id="activity-loan">Visit Tony</div>
-                <div class="button" id="activity-bank">Bank</div>
-                <div class="button" id="activity-stash">Stash Info</div>
-            </div>
         </div>
 
-        <div class="actions hide" id="deal-panel">
-            <div class="horizontal padding-bottom-4">
+        <div class="actions-holder hide" id="action-panel">
 
-                <h2>Make Deals</h2>
-                <div class="stats-spacer"></div>
+            <div class="actions" id="activity-buttons">
+                <h2 id="activities-in">Activities</h2>
+
+                <div class="activity-button-holder" id="activity-buttons">
+                    <div class="button" id="activity-deal">Buy & Sell</div>
+                    <div class="button" id="activity-travel">Travel</div>
+                    <div class="button" id="activity-loan">Visit Tony</div>
+                    <div class="button" id="activity-bank">Bank</div>
+                    <div class="button" id="activity-stash">Stash Info</div>
+                </div>
+            </div>
+
+            <div class="actions hide" id="deal-panel">
+                <div class="horizontal padding-bottom-4">
+
+                    <h2>Make Deals</h2>
+                    <div class="stats-spacer"></div>
 
 
-                <div>
-                    <input type="checkbox" id="moveMaximumProduct" />
-                    <label for="moveMaximumProduct">Buy / Sell Max</label>
+                    <div>
+                        <input type="checkbox" id="moveMaximumProduct" />
+                        <label for="moveMaximumProduct">Buy / Sell Max</label>
+                    </div>
+
+                    <br />
+
                 </div>
 
-                <br />
+                <div class="deal-info-holder" id="deal-buttons">
+
+                </div>
+            </div>
+            <div class="actions hide" id="travel-panel">
+                <h2>Travel</h2>
+                <p>*Costs 1 day*</p>
+                <div class="travel-button-holder" id="travel-buttons">
+
+                </div>
+            </div>
+            <div class="actions hide" id="loan-panel">
+                <h2>Tony's Totally Legit Taproom</h2>
+                <div class="travel-button-holder" id="loan-info">
+
+                </div>
+            </div>
+            <div class="actions hide" id="bank-panel">
+                <h2>Fourth Second Bank</h2>
+                <div class="travel-button-holder" id="bank-buttons">
+
+                </div>
+            </div>
+            <div class="actions hide" id="stash-panel">
+                <div class="padding-bottom-4">
+                    <h2>Inventory</h2>
+                </div>
+                <div class="stash-info-holder" id="stash-info">
+
+                </div>
+
+
+            </div>
+            <div class="actions hide" id="looking-for-you-panel">
+                <div class="padding-bottom-4">
+                    <h2>Inventory</h2>
+                </div>
+                <div class="stash-info-holder" id="stash-info">
+
+                </div>
+
 
             </div>
 
-            <div class="deal-info-holder" id="deal-buttons">
 
-            </div>
+
         </div>
-        <div class="actions hide" id="travel-panel">
-            <h2>Travel</h2>
-            <p>*Costs 1 day*</p>
-            <div class="travel-button-holder" id="travel-buttons">
-
-            </div>
-        </div>
-        <div class="actions hide" id="loan-panel">
-            <h2>Tony's Totally Legit Taproom</h2>
-            <div class="travel-button-holder" id="loan-info">
-
-            </div>
-        </div>
-        <div class="actions hide" id="bank-panel">
-            <h2>Fourth Second Bank</h2>
-            <div class="travel-button-holder" id="bank-buttons">
-
-            </div>
-        </div>
-        <div class="actions hide" id="stash-panel">
-            <div class="padding-bottom-4">
-                <h2>Inventory</h2>
-            </div>
-            <div class="stash-info-holder" id="stash-info">
-
-            </div>
-
-
-        </div>
-        <div class="actions hide" id="looking-for-you-panel">
-            <div class="padding-bottom-4">
-                <h2>Inventory</h2>
-            </div>
-            <div class="stash-info-holder" id="stash-info">
-
-            </div>
-
-
-        </div>
-
-
-
     </div>
-
 
 
     <div class="footer">HustleTime is a <a href="https://dectronica.com/" target="_blank">Dectronica</a> Funtime Learning Project</div>
 
-    <script type="module" src="./assets/scripts/index.js?1"></script>
+    <script type="module" src="./assets/scripts/index.js?3"></script>
 </body>
 </html>

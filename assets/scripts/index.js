@@ -126,7 +126,7 @@ let maxHealth = 0;
 let maxStash = 0;
 let countHeld = 0;
 let day = 0;
-let dayOfUpsidedness = 1; //this is the day when tony's goons come find you
+let dayOfUpsidedness = 4; //this is the day when tony's goons come find you
 
 //define travel button placeholders
 let manhattanButton = "";
@@ -142,11 +142,25 @@ let shroomsBuy = "";
 let shroomsSells = "";
 let boozeBuy = "";
 let boozeSell = "";
+let smokesBuy = "";
+let smokesSell = "";
+let acidSell = "";
+let acidBuy = "";
+let cocaineBuy = "";
+let cocaineSell = "";
+let heroinBuy = "";
+let heroinSell = "";
 
 //define drug price info placeholders
 let cannabisInfo = "";
 let shroomsInfo = "";
 let boozeInfo = "";
+let smokesInfo = "";
+let acidInfo = "";
+let cocaineInfo = "";
+let heroinInfo = "";
+
+
 
 //define drug holding placeholders for the deals panel
 let cannabisCountElement = "";
@@ -173,7 +187,7 @@ Also the house is an orphanage.
 <br />
 For kittens and puppies.
 <br /><br />
-You need to raise $100K in 30 days...OR ELSE!</p>`
+You need to raise $1M in 30 days...OR ELSE!</p>`
 
 const introMessage = `<p>
 
@@ -185,7 +199,7 @@ Tony "generously" gives you a $2,500 loan.
 <br /><br />
 Tony says he's a reasonable guy, so he's only charging ${interestRate}% interest per day.
 <br /><br />
-With a big slap on the back, Tony says his guys will come find you in a week to see how you're doing.
+With a big slap on the back, Tony says his guys will come find you in ${dayOfUpsidedness} days to see how you're doing.
 
 
 </p>`
@@ -331,8 +345,9 @@ continueFromIntroButton.addEventListener("click", event => {
 
 //call this method any time you want to update the printed UI info values
 const updateInfoPanelStats = () => {
-    cashUI.textContent = `$${cash}`;
-    debtUI.textContent = `$${debt.toFixed(2)}`;
+    cashUI.textContent = `$${cash.toLocaleString(undefined, { useGrouping: true }) }`;
+    let fixedDebt = debt.toLocaleString(undefined, { useGrouping: true });
+    debtUI.textContent = `$${fixedDebt}`;
     healthUI.textContent = `${health} / ${maxHealth}`;
     stashUI.textContent = `${countHeld} / ${maxStash}`;
     console.log("UI values updated");
@@ -408,7 +423,7 @@ const initializeDrugList= () => {
         //the inner portion (with ${drug.name}) is then overwritten in printDrugPrices() which is called at the end of this method
         dealButtonHolder.insertAdjacentHTML("beforeend",
             `<div id="${drug.name}-deal" class="drug-deal">
-                <h4 class="drug-name"> ${drug.name}</h3>
+                <h4 class="drug-name ${drug.name}-bg"> ${drug.name}</h3>
                 <div class="flex width-100">
                     <div id="${drug.id}-buy" class="button height-50">Buy</div>
                     <div id=${drug.name}-price class="drug-listing width-100"><div class="flex"><h3>$${drug.buyPrice}</h3><div class="flex"></div><h3>$${drug.sellPrice}</h3></div><h3>Holding: </h3><h3 id="${drug.id}-held">0</h3></div>
@@ -454,11 +469,62 @@ const initializeDrugList= () => {
         console.log("sell booze!")
         sellDrug(2);
     })
+    smokesBuy = document.querySelector("#smokes-deal-buy");
+    smokesBuy.addEventListener("click", event => {
+        console.log(event.srcElement.id + " click");
+        buyDrug(3);
+    })
+
+    smokesSell = document.querySelector("#smokes-deal-sell");
+    smokesSell.addEventListener("click", event => {
+        console.log(event.srcElement.id + " click");
+        sellDrug(3);
+    });
+
+    acidBuy = document.querySelector("#acid-deal-buy");
+    acidBuy.addEventListener("click", event => {
+        console.log(event.srcElement.id + " click");
+        buyDrug(4);
+    });
+
+    acidSell = document.querySelector("#acid-deal-sell");
+    acidSell.addEventListener("click", event => {
+        console.log(event.srcElement.id + " click");
+        sellDrug(4)
+    });
+
+    cocaineBuy = document.querySelector("#cocaine-deal-buy")
+    cocaineBuy.addEventListener("click", event => {
+        console.log(event.srcElement.id + " click");
+        buyDrug(5);
+    });
+
+    cocaineSell = document.querySelector("#cocaine-deal-sell");
+    cocaineSell.addEventListener("click", event => {
+        console.log(event.srcElement.id + " click");
+        sellDrug(5)
+    });
+
+    heroinBuy = document.querySelector("#heroin-deal-buy");
+    heroinBuy.addEventListener("click", event => {
+        console.log(event.srcElement.id + " click");
+        buyDrug(6)
+    });
+   
+    heroinSell = document.querySelector("#heroin-deal-sell");
+    heroinSell.addEventListener("click", event => {
+        console.log(event.srcElement.id + " click");
+        sellDrug(6);
+    });
     
 
     cannabisInfo = document.querySelector("#Cannabis-price");
     shroomsInfo = document.querySelector("#Shrooms-price");
     boozeInfo = document.querySelector("#Bootleg");
+    smokesInfo = document.querySelector("#Smokes-price");
+    acidInfo = document.querySelector("#Acid-price");
+    cocaineInfo = document.querySelector("#Cocaine-price");
+    heroinInfo = document.querySelector("#Heroin-price");
 
     cannabisCountElement = document.querySelector("#cannabis-deal-held");
     shroomsCountElement = document.querySelector("#shrooms-deal-held");
@@ -471,16 +537,18 @@ const initializeDrugList= () => {
 
 //also print the inventory count for each drug
 const printDrugPrices = () => {
-    let drugInfoArray = [cannabisInfo, shroomsInfo, boozeInfo];
+    let drugInfoArray = [cannabisInfo, shroomsInfo, boozeInfo, smokesInfo,acidInfo,cocaineInfo,heroinInfo];
     let index = 0;
     
     
     drugInfoArray.forEach(entry => {
         let name = drugs[index].name.toLowerCase();
+        let average = inventory[name].average
+        average = average.toFixed(2);
         console.log("here we go now with " + name);
         entry.innerHTML = `
-            <div class="flex justify-content-space-between width-100"><h3>$${drugs[index].buyPrice}</h3><h3>  $${drugs[index].sellPrice}</h3></div>
-            <div class="flex"><h3>Holding: </h3><h3 id="${drugs[index].id}-held" class="min-width">${inventory[name].count} @ $${inventory[name].average}</h3></div>`
+            <div class="flex justify-content-space-between width-100"><h3>$${drugs[index].buyPrice.toLocaleString(undefined, { useGrouping: true })}</h3><h3>  $${drugs[index].sellPrice.toLocaleString(undefined, { useGrouping: true }) }</h3></div>
+            <div class="flex"><h3>Holding: </h3><h3 id="${drugs[index].id}-held" class="min-width">${inventory[name].count} @ $${average.toLocaleString(undefined, { useGrouping: true }) }</h3></div>`
 
             
         index++;

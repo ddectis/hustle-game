@@ -74,15 +74,35 @@
         "count": 0,
         "cost": 0,
         "average": 0
+      },
+      "smokes": {
+        "count": 0,
+        "cost": 0,
+        "average": 0
+      },
+      "acid": {
+        "count": 0,
+        "cost": 0,
+        "average": 0
+      },
+      "cocaine": {
+        "count": 0,
+        "cost": 0,
+        "average": 0
+      },
+      "heroin":
+      {
+        "count": 0,
+        "cost": 0,
+        "average": 0
       }
-    } 
+    }
   },
-
   "drugs": [
     {
       "name": "Cannabis",
       "minPrice": 300,
-      "maxPrice": 1000,
+      "maxPrice": 750,
       "buyPrice": 0,
       "sellPrice": 0,
       "id": "cannabis-deal"
@@ -90,7 +110,7 @@
     {
       "name": "Shrooms",
       "minPrice": 150,
-      "maxPrice": 500,
+      "maxPrice": 400,
       "buyPrice": 0,
       "sellPrice": 0,
       "id": "shrooms-deal"
@@ -103,10 +123,42 @@
       "buyPrice": 0,
       "sellPrice": 0,
       "id": "booze-deal"
+    },
+    {
+      "name": "Smokes",
+      "minPrice": 40,
+      "maxPrice": 100,
+      "buyPrice": 0,
+      "sellPrice": 0,
+      "id": "smokes-deal"
+    },
+    {
+      "name": "Acid",
+      "minPrice": 200,
+      "maxPrice": 500,
+      "buyPrice": 0,
+      "sellPrice": 0,
+      "id": "acid-deal"
+    },
+    {
+      "name": "Cocaine",
+      "minPrice": 2000,
+      "maxPrice": 20000,
+      "buyPrice": 0,
+      "sellPrice": 0,
+      "id": "cocaine-deal"
+    },
+    {
+      "name": "Heroin",
+      "minPrice": 1000,
+      "maxPrice": 10000,
+      "buyPrice": 0,
+      "sellPrice": 0,
+      "id": "heroin-deal"
     }
   ]
-    
 
-    
-  
+
+
+
 }
