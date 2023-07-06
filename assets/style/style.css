@@ -62,6 +62,11 @@ p{
     font-size:0.95em;
 }
 
+.small-text{
+    font-size:0.6em;
+    text-align: center;
+}
+
 body {
     background-color: #252525;
     font-family: 'JetBrains Mono', monospace;
@@ -338,6 +343,10 @@ a{
 
 .padding-bottom-4 {
     padding-bottom: 4%;
+}
+
+.padding-top-4{
+    padding-top: 4%;
 }
 
 .hide {

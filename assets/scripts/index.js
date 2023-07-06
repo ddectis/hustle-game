@@ -100,7 +100,9 @@ viewStashButton.addEventListener("click", event => {
 hospitalActivityButton.addEventListener("click", event => {
     console.log("hospital button clicked")
     hideAllActionPanels();
+    visitHospital();
     hospitalPanel.classList.remove("hide");
+    
 
 });
 upgradeShopActivityButton.addEventListener("click", event => {
@@ -155,6 +157,7 @@ let maxStash = 0;
 let countHeld = 0;
 let day = 0;
 let dayOfUpsidedness = 4; //this is the day when tony's goons come find you
+let healingCost = 10; //when determining the total healing cost, we take the delta between current and total healt and then multiply it by this factor
 
 //define travel button placeholders
 let manhattanButton = "";
@@ -209,6 +212,9 @@ const bankInfoHolder = document.querySelector("#bank-info")
 
 //define a place to print the mugging status + minigame
 const muggingInfoHolder = document.querySelector("#mugging-info")
+
+//define a place to print the hospital info + buttons
+const hospitalInfoHolder = document.querySelector("#hospital-info")
 
 //bank withdraw buttons
 const withdraw10 = document.querySelector("#withdraw-10");
@@ -1046,6 +1052,54 @@ const playerMugged = () => {
     
 }
 
+//create the inner HTML (including buttons) for the hospital functionality
+const visitHospital = () => {
+    console.log("visiting hospital");
+    let appraisalString = "";
+    if(health === maxHealth){
+        appraisalString = "There's nothing wrong with you. Get the fuck outta here! I oughta charge you just for wasting my time"
+    }
+    if (health >= 90 && health < maxHealth) {
+        appraisalString = "You came here for that? Take this bandaid and stop wasting my time"
+    } else if (health < 90 && health >= 70) {
+        appraisalString = "That's nothing. Take some ibuprofen and stop wasting my time"
+    } else if (health < 70 && health >= 50) {
+        appraisalString = "Kids these days. They break a few bones and they think it's the end of the world. Buck of softies. Take these painkillers and get outta my sight."
+    } else if (health < 50 && health >= 30) {
+        appraisalString = "It's just a flesh wound. I've seen worse. Take this super glue and apply it to the dangling appendages. And stop being so dramatic."
+    } else if (health < 30) {
+        appraisalString = "Oh, damn. You're pretty fucked up. Let me take care of you."
+    } else if (health === 0){
+        appraisalString = "Uh, I'm not sure how to tell you this, but you're actually dead."
+    }
+
+    let healCost = (maxHealth - health) * healingCost;
+    let formattedHealCost = healCost.toLocaleString(undefined, { useGrouping: true });
+    let costString = ``;
+    if (health < maxHealth) {
+        costString = `I'm gonna need $${formattedHealCost} to patch you up.`
+    }
+
+    hospitalInfoHolder.innerHTML = `
+    <div class="padding-bottom-4">
+        <h2>${burroughs[currentLocation].name} Medical</h2>
+    </div>
+    <p>If you have $$$ we have HP. If you're broke, fuck off! What, you think healthcare is a human right of something?*</p>
+    
+    <p>The doc takes one look at you and says, "${appraisalString}."</p>
+
+    <p>${costString} </p>
+     
+
+        
+    <div class="small-text">*it is, of course, a human right. I'm making a joke here!</div>
+    `
+
+
+
+    
+}
+
 //this logic runs on page load
 loadObjectsJSON(); //and load the JSON objects for things like locations
 printWelcomeMessage(); //put the intro message on the screen
@@ -1057,6 +1111,7 @@ printWelcomeMessage(); //put the intro message on the screen
 //add json info - both in the drug category and then again in the inventory (you should probably generate the inventory dynamically based on a forEach of the names of the drugs in the drug list)
 
 //TODO:
+//the bones for the hospital, upgrade shop and gun shop are in place. Flesh them out
 //Add the county office where you can pay off the loan on grandma's house
 //add auto save functionality
 //use that functionality to add a high score system
@@ -1064,3 +1119,4 @@ printWelcomeMessage(); //put the intro message on the screen
 //add cops that chase you. More chance to get chased the more profit you make
 //add a "highest / lowest" seen thing on the market
 //add a shop so you can get some upgrades e.g. weapons and inventory
+//add a mugging / police chase mini game inside of fightOrFlight()
