@@ -7,7 +7,6 @@ const continueFromIntroButton = document.querySelector("#continue-from-intro-but
 
 //create references to UI elements here
 const statusMessageHolder = document.querySelector("#status-message")
-const statusHeading = document.querySelector("#status-header") //once the player clears the intro tabs, this STATUS heading appears in the status box that had up to that point been used for the intro text
 const infoPanel = document.querySelector("#info-panel")
 const actionPanel = document.querySelector("#action-panel")
 
@@ -15,8 +14,11 @@ const actionPanel = document.querySelector("#action-panel")
 const travelActivityButton = document.querySelector("#activity-travel");
 const dealActivityButton = document.querySelector("#activity-deal");
 const loanActivityButton = document.querySelector("#activity-loan");
-const bankActivityButton = document.querySelector("#activity-bank")
-const viewStashButton = document.querySelector("#activity-stash")
+const bankActivityButton = document.querySelector("#activity-bank");
+const viewStashButton = document.querySelector("#activity-stash");
+const hospitalActivityButton = document.querySelector("#activity-hospital");
+const upgradeShopActivityButton = document.querySelector("#activity-upgrade-shop");
+const gunShopActivityButton = document.querySelector("#activity-gun-shop");
 
 const activityButtons = [travelActivityButton,dealActivityButton,loanActivityButton,bankActivityButton]
 
@@ -37,12 +39,17 @@ const dealPanel = document.querySelector("#deal-panel");
 const loanPanel = document.querySelector("#loan-panel");
 const bankPanel = document.querySelector("#bank-panel");
 const stashPanel = document.querySelector("#stash-panel");
+const muggingPanel = document.querySelector("#mugging-panel");
+const hospitalPanel = document.querySelector("#hospital-panel");
+const upgradeShopPanel = document.querySelector("#upgrade-shop-panel");
+const gunShopPanel = document.querySelector("#gun-shop-panel");
+
 const topPanel = document.querySelector("#top-panel");
 
 //this array refers to each of the panels. This is used to show / hide each panel on button clicks
 //this array deliberately doesn't contain the lookingForYouPanel because that panel is handled differently i.e. it is triggered by game conditions and not from the player's actions
 //i.e. this array contains all of the panels that the player can choose to activate. Panels which aren't activated by the player should not be placed in this array
-const activityPanels = [travelPanel, dealPanel, loanPanel, bankPanel, stashPanel];
+const activityPanels = [travelPanel, dealPanel, loanPanel, bankPanel, stashPanel, hospitalPanel,upgradeShopPanel,gunShopPanel];
 
 //create references to action screens that the player cannot activate i.e. that trigger from game states
 const lookingForYouPanel = document.querySelector("#looking-for-you-panel")
@@ -89,6 +96,23 @@ viewStashButton.addEventListener("click", event => {
     stashPanel.classList.remove("hide");
     lookingForYouPanel.classList.add("hide");
 })
+
+hospitalActivityButton.addEventListener("click", event => {
+    console.log("hospital button clicked")
+    hideAllActionPanels();
+    hospitalPanel.classList.remove("hide");
+
+});
+upgradeShopActivityButton.addEventListener("click", event => {
+    console.log("upgrade shop button clicked")
+    hideAllActionPanels();
+    upgradeShopPanel.classList.remove("hide");
+});
+gunShopActivityButton.addEventListener("click", event => {
+    console.log("gun shop button clicked")
+    hideAllActionPanels();
+    gunShopPanel.classList.remove("hide");
+});
 
 const showDealPanel = () => {
     hideAllActionPanels();
@@ -154,6 +178,8 @@ let cocaineBuy = "";
 let cocaineSell = "";
 let heroinBuy = "";
 let heroinSell = "";
+let subBuy = "";
+let subSell = "";
 
 //define drug price info placeholders
 let cannabisInfo = "";
@@ -163,6 +189,7 @@ let smokesInfo = "";
 let acidInfo = "";
 let cocaineInfo = "";
 let heroinInfo = "";
+let subInfo = "";
 
 
 
@@ -179,6 +206,9 @@ const loanInfoHolder = document.querySelector("#loan-info")
 
 //define a place to print the bank account info
 const bankInfoHolder = document.querySelector("#bank-info")
+
+//define a place to print the mugging status + minigame
+const muggingInfoHolder = document.querySelector("#mugging-info")
 
 //bank withdraw buttons
 const withdraw10 = document.querySelector("#withdraw-10");
@@ -337,24 +367,30 @@ const createTravelButtons = () => {
 
 }
 
-//travel between burroughs. Also progresses time and checks loan status
+//travel between burroughs. Also progresses time and checks loan status. Also rolls for a chance to get mugged
 const travelClick = destination => {
     console.log("Traveling to : " + burroughs[destination].name);
     currentLocation = destination;
     day++;
     let interest = debt * interestRate / 100
     let trimmedInterest = parseFloat(interest.toFixed(2));
-    
+
+    //travel makes the day count increase so add debt
     debt += trimmedInterest; //make sure you are only adding numbers with 2 digits after the deci
     console.log("Interest: " + interest);
+
     updateStatusMessage();
     updateInfoPanelStats();
     listAvailableActivities();
     randomizeDrugPrices();
+
     if (debt > 0 && day > dayOfUpsidedness) {
         console.error("Tony's loan is overdue!! Sal is looking for you")
         lookForYou();
     }
+
+    checkForMugging();
+    
     showDealPanel(); //bring up the deal panel after a the player travels to a new burrough
 }
 
@@ -374,7 +410,7 @@ gameStartButton.addEventListener("click", event => {
 continueFromIntroButton.addEventListener("click", event => {
     console.log("continue from intro button clicked");
 
-    statusHeading.classList.remove("hide");
+    
     //define the status message based on current burrough
     updateStatusMessage();
 
@@ -435,6 +471,26 @@ const listAvailableActivities = () => {
     } else {
         travelActivityButton.classList.add("hide")
     }
+
+    if (burroughs[currentLocation].services.hospital) {
+        hospitalActivityButton.classList.remove("hide")
+    } else {
+        hospitalActivityButton.classList.add("hide")
+    }
+
+    if (burroughs[currentLocation].services.upgradeShop) {
+        upgradeShopActivityButton.classList.remove("hide")
+    } else {
+        upgradeShopActivityButton.classList.add("hide")
+    }
+
+    if (burroughs[currentLocation].services.gunShop) {
+        gunShopActivityButton.classList.remove("hide")
+    } else {
+        gunShopActivityButton.classList.add("hide")
+    }
+
+
 }
 
 
@@ -467,6 +523,7 @@ const initializeDrugList= () => {
     drugs.forEach(drug => {
         //creates an HTML template for each drug. Creates everything here so that listeners can then be attached
         //the inner portion (with ${drug.name}) is then overwritten in printDrugPrices() which is called at the end of this method
+        //console.log("Initiatlizing drug: " + drug.name)
         dealButtonHolder.insertAdjacentHTML("beforeend",
             `<div id="${drug.name}-deal" class="drug-deal">
                 <h4 class="drug-name ${drug.name}-bg"> ${drug.name}</h3>
@@ -483,60 +540,62 @@ const initializeDrugList= () => {
     cannabisBuy = document.querySelector("#cannabis-deal-buy");
     cannabisBuy.addEventListener("click", event => {
         console.log("buy cannabis!")
-        buyDrug(0); //the integer we pass into buyDrugs must be equal to the index value of the relevant drug in the drugs array (which is, in turn, taken from the objects.json)
+        buyDrug(1); //the integer we pass into buyDrugs must be equal to the index value of the relevant drug in the drugs array (which is, in turn, taken from the objects.json)
     })
 
     cannabisSell = document.querySelector("#cannabis-deal-sell");
     cannabisSell.addEventListener("click", event => {
         console.log("sell cannabis!")
-        sellDrug(0);
+        sellDrug(1);
     })
     
     shroomsBuy = document.querySelector("#shrooms-deal-buy");
     shroomsBuy.addEventListener("click", event => {
         console.log("buy shrooms!")
-        buyDrug(1);
+        buyDrug(2);
     })
 
     shroomsSells = document.querySelector("#shrooms-deal-sell");
     shroomsSells.addEventListener("click", event => {
         console.log("sell shrooms!")
-        sellDrug(1);
+        sellDrug(2);
     })
 
     boozeBuy= document.querySelector("#booze-deal-buy");
     boozeBuy.addEventListener("click", event => {
         console.log("buy booze!")
-        buyDrug(2);
+        buyDrug(0);
     })
 
     boozeSell = document.querySelector("#booze-deal-sell");
     boozeSell.addEventListener("click", event => {
         console.log("sell booze!")
-        sellDrug(2);
+        sellDrug(0);
     })
+
+    //smokes is actually Chew-Z
     smokesBuy = document.querySelector("#smokes-deal-buy");
     smokesBuy.addEventListener("click", event => {
         console.log(event.srcElement.id + " click");
-        buyDrug(3);
+        buyDrug(4);
     })
 
     smokesSell = document.querySelector("#smokes-deal-sell");
     smokesSell.addEventListener("click", event => {
         console.log(event.srcElement.id + " click");
-        sellDrug(3);
+        sellDrug(4);
     });
 
     acidBuy = document.querySelector("#acid-deal-buy");
     acidBuy.addEventListener("click", event => {
         console.log(event.srcElement.id + " click");
-        buyDrug(4);
+        buyDrug(3);
     });
 
     acidSell = document.querySelector("#acid-deal-sell");
     acidSell.addEventListener("click", event => {
         console.log(event.srcElement.id + " click");
-        sellDrug(4)
+        sellDrug(3)
     });
 
     cocaineBuy = document.querySelector("#cocaine-deal-buy")
@@ -562,15 +621,27 @@ const initializeDrugList= () => {
         console.log(event.srcElement.id + " click");
         sellDrug(6);
     });
-    
+
+    subBuy = document.querySelector("#sub-deal-buy");
+    subBuy.addEventListener("click", event => {
+        console.log(event.srcElement.id + " click");
+        buyDrug(7);
+    });
+
+    subSell = document.querySelector("#sub-deal-sell");
+    subSell.addEventListener("click", event => {
+        console.log(event.srcElement.id + " click");
+        sellDrug(7);
+    });
 
     cannabisInfo = document.querySelector("#Cannabis-price");
     shroomsInfo = document.querySelector("#Shrooms-price");
     boozeInfo = document.querySelector("#Bootleg");
-    smokesInfo = document.querySelector("#Smokes-price");
+    smokesInfo = document.querySelector("#Chew-Z-price");
     acidInfo = document.querySelector("#Acid-price");
     cocaineInfo = document.querySelector("#Cocaine-price");
     heroinInfo = document.querySelector("#Heroin-price");
+    subInfo = document.querySelector("#Substance")
 
     cannabisCountElement = document.querySelector("#cannabis-deal-held");
     shroomsCountElement = document.querySelector("#shrooms-deal-held");
@@ -583,7 +654,7 @@ const initializeDrugList= () => {
 
 //also print the inventory count for each drug
 const printDrugPrices = () => {
-    let drugInfoArray = [cannabisInfo, shroomsInfo, boozeInfo, smokesInfo,acidInfo,cocaineInfo,heroinInfo];
+    let drugInfoArray = [boozeInfo, cannabisInfo, shroomsInfo, acidInfo, smokesInfo, cocaineInfo, heroinInfo, subInfo];
     let index = 0;
     
     
@@ -591,7 +662,7 @@ const printDrugPrices = () => {
         let name = drugs[index].name.toLowerCase();
         let average = inventory[name].average
         average = average.toFixed(2);
-        console.log("here we go now with " + name);
+        //console.log("here we go now with " + name);
         entry.innerHTML = `
             <div class="flex justify-content-space-between width-100"><h3>$${drugs[index].buyPrice.toLocaleString(undefined, { useGrouping: true })}</h3><h3>  $${drugs[index].sellPrice.toLocaleString(undefined, { useGrouping: true }) }</h3></div>
             <div class="flex"><h5>Holding: </h5><h5 id="${drugs[index].id}-held" class="min-width">${inventory[name].count} @ $${average.toLocaleString(undefined, { useGrouping: true }) }</h5></div>`
@@ -622,7 +693,7 @@ const buyDrug = drugIndex => {
         inventory[name].average = inventory[name].cost / inventory[name].count;
         countHeld++;
         cash -= currentPrice;
-        console.log(inventory);
+        //console.log(inventory);
         updateInfoPanelStats();
         printDrugPrices();
 
@@ -890,6 +961,91 @@ const withdraw = percent => {
 }
 
 
+const checkForMugging = () => {
+    let muggingChanceScore = cash / 1000 + (countHeld / 4); //this factor determines how likely the player is to get mugged. The idea is to have money and stash contribute to the chance, but without making it too overpowered.
+    if (muggingChanceScore > 90) {
+        muggingChanceScore = 90;
+    }
+    
+    let mugChance = Random.int(10, 100);
+    console.log("Mugging Liklihood: " + muggingChanceScore + " Roll For Mugging: " + mugChance);
+    if (mugChance < muggingChanceScore) {
+        fightOrFlight();
+    }
+}
+
+//leave room to create extra logic to allow the player to fight back or escape
+
+const fightOrFlight = () => {
+    //placeholder pass through function for now
+    playerMugged(); //remove me
+
+    //running away has 3 possible outcomes: failure (mugged) / partial success (you drop drugs) / success (you escape with no loss)
+
+
+    //fighting back will see the player shoot at the assailant and the assailtn attack the player in return.
+    //each turn the player can fight back or run
+    //they will lose HP when the attacker shoots them. They can die
+    //player can surrender to avoid dropping to 0 HP (be advised that HP are currently drained in the playerMugged section)
+
+    
+}
+
+//handles mugging info
+const playerMugged = () => {
+    console.error("oh shit! You're getting mugged!");
+        
+    setTimeout(() => {
+        activityButtonHolder.classList.add("hide")
+        activityPanels.forEach(panel => {
+            console.log("mugging you so hiding all the panels")
+            panel.classList.add("hide");
+        });
+    }, 0)
+
+    let totalLoss = 0;
+
+    for (const drug in inventory) {
+        //console.log("Drug Name: " + drug + " " + inventory[drug].count)
+        if (inventory[drug].count > 0) {
+            let loss = Math.round(inventory[drug].count * 0.5);
+            totalLoss += loss;
+            inventory[drug].count -= loss;
+            console.log(drug + " loss: " + loss)
+        }
+    }
+    countHeld -= totalLoss;
+
+    let percentRobbed = Random.float(0.33, 0.66);
+    let robbedTotal = Math.round(cash * percentRobbed)
+    
+    cash -= robbedTotal;
+
+    let damage = Random.int(5, 50);
+    health -= damage;
+
+    muggingInfoHolder.innerHTML = `
+        <p>On your way out of the subway, you got mugged!</p>
+        <p>Those bastards took ${totalLoss} units from your stash</p>
+        <p>You lost ${damage} HP in the struggle</p>
+        <p>They also took $${robbedTotal.toLocaleString(undefined, { useGrouping: true })} from your bill fold.</p>
+        <br/>
+        <div id="continue-from-mugging" class="button">Well, that sucked. (continue)</div>`
+    muggingPanel.classList.remove("hide");
+
+    updateInfoPanelStats();
+
+    const continueButton = document.querySelector("#continue-from-mugging");
+    continueButton.addEventListener("click", event => {
+        muggingPanel.classList.add("hide");
+        activityButtonHolder.classList.remove("hide");
+    })
+        
+
+        
+    
+}
+
 //this logic runs on page load
 loadObjectsJSON(); //and load the JSON objects for things like locations
 printWelcomeMessage(); //put the intro message on the screen
@@ -901,9 +1057,10 @@ printWelcomeMessage(); //put the intro message on the screen
 //add json info - both in the drug category and then again in the inventory (you should probably generate the inventory dynamically based on a forEach of the names of the drugs in the drug list)
 
 //TODO:
-//make the info and status panels stick at the top with the use of the sticky div but implement it in such a way that it doesn't break everything
-//Add a chance to get mugged and lose some health, money, and drugs
 //Add the county office where you can pay off the loan on grandma's house
 //add auto save functionality
 //use that functionality to add a high score system
 //add special events when the prices are really high or really low
+//add cops that chase you. More chance to get chased the more profit you make
+//add a "highest / lowest" seen thing on the market
+//add a shop so you can get some upgrades e.g. weapons and inventory

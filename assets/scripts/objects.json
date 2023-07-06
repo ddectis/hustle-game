@@ -6,7 +6,10 @@
         "deal": true,
         "travel": true,
         "bank": true,
-        "loanShark": true
+        "loanShark": true,
+        "hospital": true,
+        "upgradeShop": false,
+        "gunShop": false
       }
 
     },
@@ -16,7 +19,10 @@
         "deal": true,
         "travel": true,
         "bank": false,
-        "loanShark": false
+        "loanShark": false,
+        "hospital": false,
+        "upgradeShop": false,
+        "gunShop": false
       }
 
 
@@ -27,7 +33,10 @@
         "deal": true,
         "travel": true,
         "bank": false,
-        "loanShark": false
+        "loanShark": false,
+        "hospital": false,
+        "upgradeShop": false,
+        "gunShop": true
       }
 
     },
@@ -37,7 +46,11 @@
         "deal": true,
         "travel": true,
         "bank": false,
-        "loanShark": false
+        "loanShark": false,
+        "hospital": false,
+        "upgradeShop": true,
+        "gunShop": false
+
       }
 
     },
@@ -47,7 +60,10 @@
         "deal": true,
         "travel": true,
         "bank": false,
-        "loanShark": false
+        "loanShark": false,
+        "hospital": true,
+        "upgradeShop": false,
+        "gunShop": false
       }
 
     }
@@ -60,6 +76,11 @@
     "maxHealth": 100,
     "maxStash": 100,
     "inventory": {
+      "bootleg liquor": {
+        "count": 0,
+        "cost": 0,
+        "average": 0
+      },
       "cannabis": {
         "count": 0,
         "cost": 0,
@@ -70,17 +91,12 @@
         "cost": 0,
         "average": 0
       },
-      "bootleg liquor": {
-        "count": 0,
-        "cost": 0,
-        "average": 0
-      },
-      "smokes": {
-        "count": 0,
-        "cost": 0,
-        "average": 0
-      },
       "acid": {
+        "count": 0,
+        "cost": 0,
+        "average": 0
+      },
+      "chew-z": {
         "count": 0,
         "cost": 0,
         "average": 0
@@ -90,8 +106,12 @@
         "cost": 0,
         "average": 0
       },
-      "heroin":
-      {
+      "heroin": {
+        "count": 0,
+        "cost": 0,
+        "average": 0
+      },
+      "substance d": {
         "count": 0,
         "cost": 0,
         "average": 0
@@ -100,9 +120,17 @@
   },
   "drugs": [
     {
+      "name": "Bootleg Liquor",
+      "minPrice": 25,
+      "maxPrice": 150,
+      "buyPrice": 0,
+      "sellPrice": 0,
+      "id": "booze-deal"
+    },
+    {
       "name": "Cannabis",
-      "minPrice": 300,
-      "maxPrice": 750,
+      "minPrice": 400,
+      "maxPrice": 1000,
       "buyPrice": 0,
       "sellPrice": 0,
       "id": "cannabis-deal"
@@ -110,51 +138,51 @@
     {
       "name": "Shrooms",
       "minPrice": 150,
-      "maxPrice": 400,
+      "maxPrice": 450,
       "buyPrice": 0,
       "sellPrice": 0,
       "id": "shrooms-deal"
 
     },
     {
-      "name": "Bootleg Liquor",
-      "minPrice": 75,
-      "maxPrice": 250,
-      "buyPrice": 0,
-      "sellPrice": 0,
-      "id": "booze-deal"
-    },
-    {
-      "name": "Smokes",
-      "minPrice": 40,
-      "maxPrice": 100,
-      "buyPrice": 0,
-      "sellPrice": 0,
-      "id": "smokes-deal"
-    },
-    {
       "name": "Acid",
       "minPrice": 200,
-      "maxPrice": 500,
+      "maxPrice": 700,
       "buyPrice": 0,
       "sellPrice": 0,
       "id": "acid-deal"
     },
     {
+      "name": "Chew-Z",
+      "minPrice": 1000,
+      "maxPrice": 7500,
+      "buyPrice": 0,
+      "sellPrice": 0,
+      "id": "smokes-deal"
+    },
+    {
       "name": "Cocaine",
-      "minPrice": 2000,
-      "maxPrice": 20000,
+      "minPrice": 7000,
+      "maxPrice": 30000,
       "buyPrice": 0,
       "sellPrice": 0,
       "id": "cocaine-deal"
     },
     {
       "name": "Heroin",
-      "minPrice": 1000,
-      "maxPrice": 10000,
+      "minPrice": 5000,
+      "maxPrice": 15000,
       "buyPrice": 0,
       "sellPrice": 0,
       "id": "heroin-deal"
+    },
+    {
+      "name": "Substance D",
+      "minPrice": 15000,
+      "maxPrice": 150000,
+      "buyPrice": 0,
+      "sellPrice": 0,
+      "id": "sub-deal"
     }
   ]
 

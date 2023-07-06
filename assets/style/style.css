@@ -93,7 +93,7 @@ body {
     width: 95%;
     justify-content: center;
     background: #252525;
-    
+    border-bottom: 10px ridge #6cda82;
 }
 
 .status {
@@ -146,7 +146,8 @@ a{
     flex-direction: column;
     align-items: center;
     width: 98%;
-    padding-top: 10%;
+    padding-top: 15%;
+
 }
 
 .ui-holder {
@@ -165,7 +166,8 @@ a{
     
     flex-direction: column;
     align-items: flex-start;
-    padding-top:3%;
+    padding-top:10%;
+    width:100%;
     
 }
 
@@ -210,6 +212,7 @@ a{
 
 .stats-holder {
     display: flex;
+    padding-bottom: 15px;
 }
 
 .stats-headers {
@@ -393,6 +396,10 @@ a{
     .ui-and-status {
         flex-direction: row;
     }
+
+    .ui-parent{
+        padding-top:1%;
+    }
 }
 
 @media screen and (min-width: 600px) {
@@ -406,6 +413,10 @@ a{
     
     h4{
         font-size:1.6em;
+    }
+
+    h5{
+        font-size:1.5em;
     }
 
     .status {
@@ -429,6 +440,10 @@ a{
 
     .drug-name{
         
+    }
+
+    .stash-card{
+        height:120px;
     }
     
 }
