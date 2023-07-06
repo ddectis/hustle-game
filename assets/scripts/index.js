@@ -37,6 +37,7 @@ const dealPanel = document.querySelector("#deal-panel");
 const loanPanel = document.querySelector("#loan-panel");
 const bankPanel = document.querySelector("#bank-panel");
 const stashPanel = document.querySelector("#stash-panel");
+const topPanel = document.querySelector("#top-panel");
 
 //this array refers to each of the panels. This is used to show / hide each panel on button clicks
 //this array deliberately doesn't contain the lookingForYouPanel because that panel is handled differently i.e. it is triggered by game conditions and not from the player's actions
@@ -382,8 +383,9 @@ continueFromIntroButton.addEventListener("click", event => {
     //as well as the UI Action Panel
     actionPanel.classList.remove("hide");
     dealPanel.classList.remove("hide");
-
+    topPanel.classList.add("sticky-div")
     continueFromIntroButton.classList.add("hide")
+    
 })
 
 //call this method any time you want to update the printed UI info values
@@ -401,7 +403,7 @@ const updateInfoPanelStats = () => {
 const updateStatusMessage = () => {
     statusMessage = `<p>It is Day ${day}.</p>`
     if (debt > 0) {
-        statusMessage += `<br/><p>Tony expects full payment by Day ${dayOfUpsidedness}</p>`
+        statusMessage += `<p>Tony expects full payment by Day ${dayOfUpsidedness}</p>`
     }
     statusMessageHolder.innerHTML = statusMessage;
 }
