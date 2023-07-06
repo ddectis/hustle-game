@@ -44,6 +44,7 @@ const hospitalPanel = document.querySelector("#hospital-panel");
 const upgradeShopPanel = document.querySelector("#upgrade-shop-panel");
 const gunShopPanel = document.querySelector("#gun-shop-panel");
 
+
 const topPanel = document.querySelector("#top-panel");
 
 //this array refers to each of the panels. This is used to show / hide each panel on button clicks
@@ -113,6 +114,7 @@ upgradeShopActivityButton.addEventListener("click", event => {
 gunShopActivityButton.addEventListener("click", event => {
     console.log("gun shop button clicked")
     hideAllActionPanels();
+    visitGunShop();
     gunShopPanel.classList.remove("hide");
 });
 
@@ -146,6 +148,7 @@ let statusMessage = "";
 let burroughs = []; //this is an object that will contain additional info about each location e.g. services,  etc
 let drugs = {};
 let inventory = {};
+let weapons = {};
 
 //define player stats placeholders
 let cash = 0;
@@ -157,7 +160,7 @@ let maxStash = 0;
 let countHeld = 0;
 let day = 0;
 let dayOfUpsidedness = 4; //this is the day when tony's goons come find you
-let healingCost = 10; //when determining the total healing cost, we take the delta between current and total healt and then multiply it by this factor
+let healingCost = 100; //when determining the total healing cost, we take the delta between current and total healt and then multiply it by this factor
 
 //define travel button placeholders
 let manhattanButton = "";
@@ -215,6 +218,9 @@ const muggingInfoHolder = document.querySelector("#mugging-info")
 
 //define a place to print the hospital info + buttons
 const hospitalInfoHolder = document.querySelector("#hospital-info")
+
+//define a place to print thee gun shop info + buttons
+const gunShopInfoHoldder = document.querySelector("#gun-shop-info")
 
 //bank withdraw buttons
 const withdraw10 = document.querySelector("#withdraw-10");
@@ -299,10 +305,12 @@ const loadObjectsJSON = async() => {
         burroughs = objects.locations; //grab the location objects from the objects master list
         drugs = objects.drugs;
         inventory = objects.playerInfo.inventory;
+        weapons = objects.weapons;
 
         console.log(inventory);
         console.log(burroughs)
-        console.log(drugs)
+        console.log(drugs);
+        console.log(weapons);
 
         console.log(inventory);
 
@@ -775,8 +783,8 @@ const visitTony = () => {
     }
 
     
-
-    loanInfoHolder.innerHTML =
+    if (debt > 0) {
+        loanInfoHolder.innerHTML =
         `<div class="loan-holder">
             <h3>Tony expects payment in ${loanDaysRemaining} ${dayOrDays}</h3>
             <h3>Debt: $${debt}</h3>
@@ -785,10 +793,20 @@ const visitTony = () => {
         </div>
         `
 
-    let pay500Button = document.querySelector("#pay-500");
-    pay500Button.addEventListener("click", () => {
-        payDebt();
-    })
+        let pay500Button = document.querySelector("#pay-500");
+        pay500Button.addEventListener("click", () => {
+            payDebt();
+        })
+    } else {
+        loanInfoHolder.innerHTML = `
+        <div class="loan-holder">
+            <h3>Tony says, "Pleasure doin' business with ya. Thanks for being as honest and upstanding as I am."</h3>
+            <h3>"Now get outta here before I take a piece of your action!"</h3>
+
+        </div>
+        `
+    }
+    
 
 }
 
@@ -968,12 +986,16 @@ const withdraw = percent => {
 
 
 const checkForMugging = () => {
-    let muggingChanceScore = cash / 1000 + (countHeld / 4); //this factor determines how likely the player is to get mugged. The idea is to have money and stash contribute to the chance, but without making it too overpowered.
+
+    let cashFactor = cash / 1000;
+    let inventoryFactor = countHeld / 4;
+    let muggingChanceScore = cashFactor + inventoryFactor; //this factor determines how likely the player is to get mugged. The idea is to have money and stash contribute to the chance, but without making it too overpowered.
     if (muggingChanceScore > 90) {
         muggingChanceScore = 90;
     }
     
     let mugChance = Random.int(10, 100);
+    console.log("Mugging CashFactor: " + cashFactor + " InventoryFactor: " + inventoryFactor);
     console.log("Mugging Liklihood: " + muggingChanceScore + " Roll For Mugging: " + mugChance);
     if (mugChance < muggingChanceScore) {
         fightOrFlight();
@@ -1056,6 +1078,8 @@ const playerMugged = () => {
 const visitHospital = () => {
     console.log("visiting hospital");
     let appraisalString = "";
+
+    //check the player's health to determine how the doctor responds
     if(health === maxHealth){
         appraisalString = "There's nothing wrong with you. Get the fuck outta here! I oughta charge you just for wasting my time"
     }
@@ -1073,31 +1097,87 @@ const visitHospital = () => {
         appraisalString = "Uh, I'm not sure how to tell you this, but you're actually dead."
     }
 
+   
+    
+    //calculate the cost to heal (and format it e.g. $1,234.56)
     let healCost = (maxHealth - health) * healingCost;
     let formattedHealCost = healCost.toLocaleString(undefined, { useGrouping: true });
+    //also generate a description string and a placeholder to later hold a button to heal the player
     let costString = ``;
+    let healButtonString = ``;
+
+
+    
+    //if the player is at full health, cost to heal and the healing button remain empty
     if (health < maxHealth) {
+        
         costString = `I'm gonna need $${formattedHealCost} to patch you up.`
+        healButtonString = `<div id="heal-button" class="button">Okay, doc (pay the fee)</div>`
     }
 
+    //print the hospital info
     hospitalInfoHolder.innerHTML = `
     <div class="padding-bottom-4">
         <h2>${burroughs[currentLocation].name} Medical</h2>
     </div>
     <p>If you have $$$ we have HP. If you're broke, fuck off! What, you think healthcare is a human right of something?*</p>
-    
+    <br/>
     <p>The doc takes one look at you and says, "${appraisalString}."</p>
-
+    <br/>
     <p>${costString} </p>
-     
+    <br/>
+    ${healButtonString}
 
         
-    <div class="small-text">*it is, of course, a human right. I'm making a joke here!</div>
+    <div class="small-text padding-top-8">*healthcare is, of course, a human right. I'm making a joke here!</div>
     `
+    //only do things with the healButton when health is < max i.e. when that button is sure to exist
+    //there's certainly a more elegant way to handle this e.g. try catch. But this works for now
+    if (health < maxHealth) {
+        const healButton = document.querySelector("#heal-button");
+        console.log("HealButton: " + healButton);
+        healButton.addEventListener("click", event => {
+            console.log("heal button click");
+            if (cash > healCost) {
+                health = maxHealth;
+                cash -= healCost;
+                hospitalInfoHolder.innerHTML = `<p>Thank you for supporting our for-profit healthcare enterprise!</p><p><br/> Should you encounter more trauma (while still having have the funds to afford it), we'll be here for you.`
+                updateInfoPanelStats();
+            }
 
+        })
+    }
+        
+}
 
+const visitGunShop = () => {
+    console.log("visiting gun shop");
+    gunShopInfoHoldder.innerHTML = `<p>We got guns. You need guns.</p>`
+    weapons.forEach(gun => {
+        console.log(gun.name + " " + gun.cost)
+        gunShopInfoHoldder.insertAdjacentHTML("beforeend", `
+        <div id="buy-${gun.id}" class="button justify-content-space-between padding-inline-5"><h2>${gun.name.toUpperCase()}</h2><h2>$${gun.cost.toLocaleString(undefined, { useGrouping: true }) }</h2></div>
+        `)
+    })
 
-    
+    const buyPistolButton = document.querySelector("#buy-pistol")
+    const buyShotgunButton = document.querySelector("#buy-shotgun")
+    const buyUziButton = document.querySelector("#buy-uzi")
+    const buyPlasmaRifleButton = document.querySelector("#buy-plasma")
+   ;  
+
+    buyPistolButton.addEventListener("click", event => {
+        console.log(event.srcElement.id + " click")
+    })
+    buyShotgunButton.addEventListener("click", event => {
+        console.log(event.srcElement.id + " click")
+    })
+    buyUziButton.addEventListener("click", event => {
+        console.log(event.srcElement.id + " click")
+    })
+    buyPlasmaRifleButton.addEventListener("click", event => {
+        console.log(event.srcElement.id + " click")
+    })
 }
 
 //this logic runs on page load
@@ -1111,7 +1191,8 @@ printWelcomeMessage(); //put the intro message on the screen
 //add json info - both in the drug category and then again in the inventory (you should probably generate the inventory dynamically based on a forEach of the names of the drugs in the drug list)
 
 //TODO:
-//the bones for the hospital, upgrade shop and gun shop are in place. Flesh them out
+//the bones upgrade shop and gun shop are in place. Flesh them out
+//it's possible to have tony find you and get mugged at the same time. Make that not be possible
 //Add the county office where you can pay off the loan on grandma's house
 //add auto save functionality
 //use that functionality to add a high score system

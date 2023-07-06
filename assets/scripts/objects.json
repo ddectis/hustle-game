@@ -69,7 +69,6 @@
     }
 
   ],
-
   "playerInfo": {
     "cash": 2500,
     "debt": 2500,
@@ -184,9 +183,32 @@
       "sellPrice": 0,
       "id": "sub-deal"
     }
+  ],
+  "weapons": [
+    {
+      "name": "pistol",
+      "cost": 5000,
+      "shots": 1,
+      "id": "pistol"
+    },
+    {
+      "name": "shotgun",
+      "cost": 25000,
+      "shots": 2,
+      "id": "shotgun"
+    },
+    {
+      "name": "uzi",
+      "cost": 100000,
+      "shots": 4,
+      "id": "uzi"
+    },
+    {
+      "name": "plasma rifle",
+      "cost": 250000,
+      "shots": 10,
+      "id": "plasma"
+    }
   ]
-
-
-
 
 }

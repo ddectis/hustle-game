@@ -45,6 +45,7 @@ h3{
     text-align:center;
     padding-inline: 5px;
     font-size:1.3em;   
+    font-weight:bold;
 }
 
 h4{
@@ -329,6 +330,10 @@ a{
     justify-content:space-between;
 }
 
+.padding-inline-5{
+    padding-inline:5%;
+}
+
 .min-width{
 
 }
@@ -345,8 +350,8 @@ a{
     padding-bottom: 4%;
 }
 
-.padding-top-4{
-    padding-top: 4%;
+.padding-top-8{
+    padding-top: 8%;
 }
 
 .hide {
