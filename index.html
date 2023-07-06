@@ -23,6 +23,7 @@
 
                     <div class="stats-headers">
                         <p>Cash: </p>
+                        <p>Bank: </p>
                         <p>Debt: </p>
                         <p>Health: </p>
                         <p>Stash: </p>
@@ -32,6 +33,7 @@
                     <div class="stats-spacer"></div>
                     <div class="stats-data">
                         <p id="cash">$1,234</p>
+                        <p id="bank">$1,234</p>
                         <p id="debt">$5,678 </p>
                         <p id="health">100 / 100 </p>
                         <p id="stash">85 / 100</p>
@@ -109,7 +111,31 @@
             <div class="actions hide" id="bank-panel">
                 <h2>Fourth Second Bank</h2>
                 <div class="travel-button-holder" id="bank-buttons">
+                    <p><br />Hello esteemed patron.</p><br /><br />
+                    <br /><p>Worried about getting mugged carrying around all of that totally-legal cash? Let us keep it safe! Sure, we don't pay interst. But we also don't ask questions.</p><br /><p><br /> How much would you like to deposit?</p>
+                    <div class="bank-buttons-parent">
+                        <div class="bank-button-holder">
+                            <h3>Withdraw</h3>
+                            <div class="bank-buttons">
+                                <div id="withdraw-10" class="button">10%</div>
+                                <div id="withdraw-25" class="button">25%</div>
+                                <div id="withdraw-100" class="button">100%</div>
+                            </div>
 
+                        </div>
+                        <div id="bank-info" class="bank-button-holder">
+
+
+                        </div>
+                        <div class="bank-button-holder">
+                            <h3>Deposit</h3>
+                            <div class="bank-buttons">
+                                <div id="deposit-10" class="button">10%</div>
+                                <div id="deposit-25" class="button">25%</div>
+                                <div id="deposit-100" class="button">100%</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="actions hide" id="stash-panel">
@@ -135,10 +161,11 @@
 
 
 
-        </div>
+        
+
     </div>
 
-
+    </div>
     <div class="footer">HustleTime is a <a href="https://dectronica.com/" target="_blank">Dectronica</a> Funtime Learning Project</div>
 
     <script type="module" src="./assets/scripts/index.js?3"></script>

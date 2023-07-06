@@ -44,13 +44,17 @@ h2{
 h3{
     text-align:center;
     padding-inline: 5px;
-   
+    font-size:1.3em;   
 }
 
 h4{
     font-size:1.1em;
     text-align:center;
     padding-top:2%;
+}
+
+h5{
+
 }
 
 p{
@@ -85,7 +89,7 @@ body {
 
 .ui-and-status {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     width: 95%;
     justify-content: center;
 }
@@ -245,6 +249,12 @@ a{
 
 }
 
+.sticky-div {
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
 .drug-name {
     width: 100%;
     background-color: #6cda8282;
@@ -357,8 +367,28 @@ a{
 
 }
 
+.bank-buttons{
+
+}
+
+.bank-button-holder{
+
+}
+
+.bank-buttons-parent {
+    display: flex;
+    align-items: center;
+    padding-top: 5%;
+    width: 100%;
+    justify-content: space-around;
+}
+
 @media screen and (min-width: 600px) {
     h2{
+        font-size:2em;
+    }
+
+    h3{
         font-size:2em;
     }
     
@@ -371,12 +401,18 @@ a{
         max-width: 75%;
     }
 
+    .ui-and-status {
+        flex-direction: row;
+        
+    }
+
+
     .ui-parent{
         width:66%;
     }
 
     .drug-name{
-        width: 75%;
+        
     }
     
 }
@@ -384,9 +420,9 @@ a{
 @media screen and (min-width: 1000px) {
     
     .drug-deal {
-        flex-direction: row;
+        
     }
     .drug-name {
-        justify-content: flex-end;
+        
     }
 }

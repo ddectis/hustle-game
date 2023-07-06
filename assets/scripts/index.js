@@ -59,7 +59,7 @@ travelActivityButton.addEventListener("click", event => {
     console.log("travel button clicked");
     hideAllActionPanels();
     travelPanel.classList.remove("hide");
-    lookingForYouPanel.classList.add("hide");
+    lookingForYouPanel.classList.add("hide"); 
 
 })
 dealActivityButton.addEventListener("click", event => {
@@ -79,6 +79,7 @@ bankActivityButton.addEventListener("click", event => {
     hideAllActionPanels();
     bankPanel.classList.remove("hide");
     lookingForYouPanel.classList.add("hide");
+    visitBank();
 })
 viewStashButton.addEventListener("click", event => {
     console.log("stash button clicked");
@@ -104,6 +105,7 @@ const hideAllActionPanels = () => {
 //references to player stats on the UI info panel
 const cashUI = document.querySelector("#cash")
 const debtUI = document.querySelector("#debt")
+const bankUI = document.querySelector("#bank");
 const healthUI = document.querySelector("#health")
 const stashUI = document.querySelector("#stash")
 
@@ -121,6 +123,7 @@ let inventory = {};
 //define player stats placeholders
 let cash = 0;
 let debt = 0;
+let bank = 0;
 let health = 0;
 let maxHealth = 0;
 let maxStash = 0;
@@ -173,6 +176,46 @@ const stashInfoHolder = document.querySelector("#stash-info");
 //define a place to print loanshark info
 const loanInfoHolder = document.querySelector("#loan-info")
 
+//define a place to print the bank account info
+const bankInfoHolder = document.querySelector("#bank-info")
+
+//bank withdraw buttons
+const withdraw10 = document.querySelector("#withdraw-10");
+const withdraw25 = document.querySelector("#withdraw-25");
+const withdraw100 = document.querySelector("#withdraw-100");
+
+//bank withdraw listeners
+withdraw10.addEventListener("click", event => {
+    console.log(event.srcElement.id + " click");
+    withdraw(10);
+})
+withdraw25.addEventListener("click", event => {
+    console.log(event.srcElement.id + " click");
+    withdraw(25);
+})
+withdraw100.addEventListener("click", event => {
+    console.log(event.srcElement.id + " click");
+    withdraw(100);
+})
+
+//bank deposit buttonss
+const deposit10 = document.querySelector("#deposit-10");
+const deposit25 = document.querySelector("#deposit-25");
+const deposit100 = document.querySelector("#deposit-100");
+
+//bank deposit listeners
+deposit10.addEventListener("click", event => {
+    console.log(event.srcElement.id + " click");
+    deposit(10);
+})
+deposit25.addEventListener("click", event => {
+    console.log(event.srcElement.id + " click");
+    deposit(25);
+})
+deposit100.addEventListener("click", event => {
+    console.log(event.srcElement.id + " click");
+    deposit(100);
+})
 
 
 let drugListInitialized = false;
@@ -345,7 +388,8 @@ continueFromIntroButton.addEventListener("click", event => {
 
 //call this method any time you want to update the printed UI info values
 const updateInfoPanelStats = () => {
-    cashUI.textContent = `$${cash.toLocaleString(undefined, { useGrouping: true }) }`;
+    cashUI.textContent = `$${cash.toLocaleString(undefined, { useGrouping: true })}`; //toLocaleString etc is a method to print a number e.g. $35,235.35
+    bankUI.textContent = `$${bank.toLocaleString(undefined, { useGrouping: true })}`;
     let fixedDebt = debt.toLocaleString(undefined, { useGrouping: true });
     debtUI.textContent = `$${fixedDebt}`;
     healthUI.textContent = `${health} / ${maxHealth}`;
@@ -548,7 +592,7 @@ const printDrugPrices = () => {
         console.log("here we go now with " + name);
         entry.innerHTML = `
             <div class="flex justify-content-space-between width-100"><h3>$${drugs[index].buyPrice.toLocaleString(undefined, { useGrouping: true })}</h3><h3>  $${drugs[index].sellPrice.toLocaleString(undefined, { useGrouping: true }) }</h3></div>
-            <div class="flex"><h3>Holding: </h3><h3 id="${drugs[index].id}-held" class="min-width">${inventory[name].count} @ $${average.toLocaleString(undefined, { useGrouping: true }) }</h3></div>`
+            <div class="flex"><h5>Holding: </h5><h5 id="${drugs[index].id}-held" class="min-width">${inventory[name].count} @ $${average.toLocaleString(undefined, { useGrouping: true }) }</h5></div>`
 
             
         index++;
@@ -818,6 +862,32 @@ const checkHealth = () => {
     }
 }
 
+//brings up bank info
+const visitBank = () => {
+    console.log("Visiting bank")
+    bankInfoHolder.innerHTML = `<p>You have $${bank} in the bank.`
+
+}
+
+const deposit = percent => {
+    console.log("Depositing: " + percent);
+    let depositAmount = cash * percent / 100;
+    bank += depositAmount;
+    cash -= depositAmount;
+    updateInfoPanelStats();
+    visitBank();
+}
+
+const withdraw = percent => {
+    console.log("Withdrawing: " + percent);
+    let withdrawAmount = bank * percent / 100;
+    bank -= withdrawAmount;
+    cash += withdrawAmount;
+    updateInfoPanelStats();
+    visitBank();
+}
+
+
 //this logic runs on page load
 loadObjectsJSON(); //and load the JSON objects for things like locations
 printWelcomeMessage(); //put the intro message on the screen
@@ -829,7 +899,9 @@ printWelcomeMessage(); //put the intro message on the screen
 //add json info - both in the drug category and then again in the inventory (you should probably generate the inventory dynamically based on a forEach of the names of the drugs in the drug list)
 
 //TODO:
-//improve the layout on narrow screens :(
+//make the info and status panels stick at the top with the use of the sticky div but implement it in such a way that it doesn't break everything
 //Add a chance to get mugged and lose some health, money, and drugs
-//Add a bank where you can deposit funds to keep them safe from being mugged
 //Add the county office where you can pay off the loan on grandma's house
+//add auto save functionality
+//use that functionality to add a high score system
+//add special events when the prices are really high or really low
