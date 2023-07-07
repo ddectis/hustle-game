@@ -19,6 +19,7 @@ const viewStashButton = document.querySelector("#activity-stash");
 const hospitalActivityButton = document.querySelector("#activity-hospital");
 const upgradeShopActivityButton = document.querySelector("#activity-upgrade-shop");
 const gunShopActivityButton = document.querySelector("#activity-gun-shop");
+const countyActivytButton = document.querySelector("#activity-county")
 
 const activityButtons = [travelActivityButton,dealActivityButton,loanActivityButton,bankActivityButton]
 
@@ -43,6 +44,7 @@ const muggingPanel = document.querySelector("#mugging-panel");
 const hospitalPanel = document.querySelector("#hospital-panel");
 const upgradeShopPanel = document.querySelector("#upgrade-shop-panel");
 const gunShopPanel = document.querySelector("#gun-shop-panel");
+const countyPanel = document.querySelector("#county-panel");
 
 
 const topPanel = document.querySelector("#top-panel");
@@ -54,6 +56,7 @@ const activityPanels = [travelPanel, dealPanel, loanPanel, bankPanel, stashPanel
 
 //create references to action screens that the player cannot activate i.e. that trigger from game states
 const lookingForYouPanel = document.querySelector("#looking-for-you-panel")
+const endOfGamePanel = document.querySelector("#end-of-game-panel")
 
 const moveMaximumPossibleToggle = document.querySelector("#moveMaximumProduct");
 let moveMaximumPossible = false;
@@ -120,6 +123,12 @@ gunShopActivityButton.addEventListener("click", event => {
     visitGunShop();
     gunShopPanel.classList.remove("hide");
 });
+countyActivytButton.addEventListener("click", event => {
+    console.log("county office clicked");
+    hideAllActionPanels();
+    lookingForYouPanel.classList.add("hide");
+    countyPanel.classList.remove("hide");
+})
 
 const showDealPanel = () => {
     hideAllActionPanels();
@@ -142,7 +151,7 @@ const healthUI = document.querySelector("#health")
 const stashUI = document.querySelector("#stash")
 
 
-let interestRate = 10; 
+
 let currentLocation = 0; //this is an array index value that connects to "locations" which is an array of location objects
 
 let statusMessage = "";
@@ -162,8 +171,10 @@ let maxHealth = 0;
 let maxStash = 0;
 let countHeld = 0;
 let day = 0;
-let dayOfUpsidedness = 4; //this is the day when tony's goons come find you
-let healingCost = 100; //when determining the total healing cost, we take the delta between current and total healt and then multiply it by this factor
+let dayOfUpsidedness = 7; //this is the day when tony's goons come find you
+let healingCost = 300; //when determining the total healing cost, we take the delta between current and total healt and then multiply it by this factor
+let toalDaysInGame = 30;
+let interestRate = 20; 
 
 //define travel button placeholders
 let manhattanButton = "";
@@ -267,6 +278,7 @@ deposit100.addEventListener("click", event => {
 
 
 let drugListInitialized = false;
+let drugPriceNewsString = ``; //this string will be used to store drug price announcements in the status bar e.g. price crash or skyrocket
 
 
 const welcomeMessage = `<p>Oh, man. <br/><br/>The county tax assessor 
@@ -278,7 +290,7 @@ Also the house is an orphanage.
 <br />
 For kittens and puppies.
 <br /><br />
-You need to raise $1M in 30 days...OR ELSE!</p>`
+You need to raise $1,000,000 in 30 days...OR ELSE!</p>`
 
 const introMessage = `<p>
 
@@ -399,10 +411,12 @@ const travelClick = destination => {
     debt += trimmedInterest; //make sure you are only adding numbers with 2 digits after the deci
     console.log("Interest: " + interest);
 
-    updateStatusMessage();
-    updateInfoPanelStats();
-    listAvailableActivities();
-    randomizeDrugPrices();
+    checkDay(); //check to see if the game is over or not
+    updateInfoPanelStats(); //update the printed stats values e.g. cash, debt, health etc
+    listAvailableActivities(); //based on which burrough you are in, different activities will be available. This method handles that show / hide behavior
+    randomizeDrugPrices(); 
+    updateStatusMessage(); //if any exceptional drug prices were rolled, they will be printed here
+
 
     if (debt > 0 && day > dayOfUpsidedness) {
         console.error("Tony's loan is overdue!! Sal is looking for you")
@@ -414,6 +428,20 @@ const travelClick = destination => {
     showDealPanel(); //bring up the deal panel after a the player travels to a new burrough
 }
 
+const checkDay = () => {
+    if (day <= toalDaysInGame) {
+        console.log("the game is not over. It continues.")
+    } else {
+        setTimeout(() => {
+            activityButtonHolder.classList.add("hide");
+            hideAllActionPanels();
+            topPanel.classList.add("hide");
+            travelPanel.classList.add("hide");
+            endOfGamePanel.classList.remove("hide")
+        }, 0);
+        
+    }
+}
 
 //game start button click
 gameStartButton.addEventListener("click", event => {
@@ -457,10 +485,11 @@ const updateInfoPanelStats = () => {
 }
 
 const updateStatusMessage = () => {
-    statusMessage = `<p>It is Day ${day}.</p>`
+    statusMessage = `<p>It is Day ${day} of ${toalDaysInGame}.</p>`
     if (debt > 0) {
         statusMessage += `<p>Tony expects full payment by Day ${dayOfUpsidedness}</p>`
     }
+    statusMessage += drugPriceNewsString;
     statusMessageHolder.innerHTML = statusMessage;
 }
 
@@ -510,17 +539,43 @@ const listAvailableActivities = () => {
         gunShopActivityButton.classList.add("hide")
     }
 
+    if (burroughs[currentLocation].services.county) {
+        countyActivytButton.classList.remove("hide")
+    } else {
+        countyActivytButton.classList.add("hide")
+    }
+
 
 }
 
 
 const randomizeDrugPrices = () => {
-    console.log("randomizing drug prices");
-    
+    console.log("randomizing drug pricesfor day# " + day);
+    drugPriceNewsString = ``;
     //you've got an array called drugs
     drugs.forEach(drug => {
+        
+        let minPrice = drug.minPrice;
+        let maxPrice = drug.maxPrice;
+
+        let priceRandomizer = Random.int(0, 100);
+        console.log(drug.name + " price index: " + priceRandomizer)
+        if (priceRandomizer <= 1) {
+            console.log(drug.name + " price crash!")
+            drugPriceNewsString += `<p>${drug.name} prices have crashed!</p>`
+            maxPrice = minPrice; //make the old minimum be the new maximum
+            minPrice *= 0.33; //and then decrease the minimum
+            
+        }
+        if (priceRandomizer >= 99) {
+            console.log(drug.name + " price skyrockets!")
+            drugPriceNewsString += `<p>${drug.name} price are very high!</p>`
+            minPrice = maxPrice; //make the old max the new min 
+            maxPrice *= 2;   //and define and even lower new min value
+        }
+
         //randomize the price of each drug in that array based on the min and max price parameters found in objects.json
-        drug.sellPrice = Random.int(drug.minPrice, drug.maxPrice) //randomize the sell price
+        drug.sellPrice = Random.int(minPrice, maxPrice) //randomize the sell price
         drug.buyPrice = (drug.sellPrice * 1.1); //calculate a buy price that's a bit more expensive
         drug.buyPrice = parseFloat(drug.buyPrice.toFixed(0)); //get rid of the digits after the decimal for the buy price
         console.log(drug.name + " " + drug.sellPrice)
@@ -542,7 +597,7 @@ const initializeDrugList= () => {
     
     drugs.forEach(drug => {
         //creates an HTML template for each drug. Creates everything here so that listeners can then be attached
-        //the inner portion (with ${drug.name}) is then overwritten in printDrugPrices() which is called at the end of this method
+        //the inner portion (with ${drug.name) is then overwritten in printDrugPrices() which is called at the end of this method
         //console.log("Initiatlizing drug: " + drug.name)
         dealButtonHolder.insertAdjacentHTML("beforeend",
             `<div id="${drug.name}-deal" class="drug-deal">
@@ -762,6 +817,7 @@ const sellDrug = drugIndex => {
 const printInventory = () => {
     console.log("Printing Inventory");
     stashInfoHolder.innerHTML = "";
+
     let i = 0;
     for (const key in inventory) {
         console.log(key + ": " + inventory[key].count)
@@ -815,6 +871,7 @@ const visitTony = () => {
     
 
 }
+
 
 const payDebt = () => {
 
@@ -1002,6 +1059,7 @@ const checkForMugging = () => {
         muggingChanceScore = 60;
     }
 
+    
     if (muggingChanceScore < 5) {
         muggingChanceScore = 5;
     }
@@ -1016,12 +1074,17 @@ const checkForMugging = () => {
 
 //logic to allow the player to fight back or escape
 
+const checkIfPlayerHasWeapon = () => {
+    return weapons.some((weapon) => weapon.playerHas === true);
+    
+}
+
 const fightOrFlight = () => {
     //placeholder pass through function for now
     //playerMugged(); //remove me
 
     //check to see if the player has any weapons
-    const playerHasWeapon = weapons.some((weapon) => weapon.playerHas === true);
+    const playerHasWeapon = checkIfPlayerHasWeapon();
     console.log("Player Has Weapon? " + playerHasWeapon);
 
     setTimeout(() => {
@@ -1465,12 +1528,14 @@ printWelcomeMessage(); //put the intro message on the screen
 //add json info - both in the drug category and then again in the inventory (you should probably generate the inventory dynamically based on a forEach of the names of the drugs in the drug list)
 
 //TODO:
+//flesh out the end of game screen
 //the bones upgrade shop and are in place. Flesh them out
+//make the value of your inventory (as opposed to the overall count) contribute more to your chance of getting mugged
 //it's possible to have tony find you and get mugged at the same time. Make that not be possible
+
 //Add the county office where you can pay off the loan on grandma's house
 //add auto save functionality
 //use that functionality to add a high score system
-//add special events when the prices are really high or really low
-//add cops that chase you. More chance to get chased the more profit you make
+//add cops that chase you. More chance to get chased the more profit you make -> how is this different than a mugging? 
 //add a "highest / lowest" seen thing on the market
-//add a shop so you can get some upgrades e.g. weapons and inventory
+//add a shop so you can get some upgrades e.g. inventory size / body armor

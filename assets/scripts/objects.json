@@ -9,7 +9,8 @@
         "loanShark": true,
         "hospital": true,
         "upgradeShop": false,
-        "gunShop": false
+        "gunShop": false,
+        "county": false
       }
 
     },
@@ -22,7 +23,8 @@
         "loanShark": false,
         "hospital": false,
         "upgradeShop": false,
-        "gunShop": false
+        "gunShop": false,
+        "county": false
       }
 
 
@@ -36,7 +38,8 @@
         "loanShark": false,
         "hospital": false,
         "upgradeShop": false,
-        "gunShop": true
+        "gunShop": true,
+        "county": false
       }
 
     },
@@ -49,7 +52,8 @@
         "loanShark": false,
         "hospital": false,
         "upgradeShop": true,
-        "gunShop": false
+        "gunShop": false,
+        "county": false
 
       }
 
@@ -63,7 +67,8 @@
         "loanShark": false,
         "hospital": true,
         "upgradeShop": false,
-        "gunShop": false
+        "gunShop": false,
+        "county": true
       }
 
     }
@@ -178,8 +183,8 @@
     },
     {
       "name": "Substance D",
-      "minPrice": 15000,
-      "maxPrice": 150000,
+      "minPrice": 25000,
+      "maxPrice": 75000,
       "buyPrice": 0,
       "sellPrice": 0,
       "id": "sub-deal"

@@ -219,6 +219,7 @@ a{
 .stats-holder {
     display: flex;
     padding-bottom: 15px;
+    padding-top:5px;
 }
 
 .stats-headers {
