@@ -1006,8 +1006,6 @@ const checkForMugging = () => {
         muggingChanceScore = 5;
     }
 
-    muggingChanceScore = 100;
-    
     let mugChance = Random.int(0, 100);
     console.log("Mugging CashFactor: " + cashFactor + " InventoryFactor: " + inventoryFactor);
     console.log("Mugging Liklihood: " + muggingChanceScore + " Roll For Mugging: " + mugChance);
@@ -1034,15 +1032,15 @@ const fightOrFlight = () => {
         });
     }, 0)
 
+    fightBackInfoHolder.innerHTML = ``; //clear any text left over from any previous mugging
+
     let ammo = 0;
     let canYouFightString = ``;
     let bestWeaponHeld = ""
     let yourOptionsAre = ``;
     let fightString = ``;
-    console.log(bestWeaponHeld)
-    if (playerHasWeapon) {
-        
 
+    if (playerHasWeapon) {
         //figure out the best weapon that the player is carrying and determine how many shots it gives the player
         weapons.forEach(weapon => {
             if (weapon.playerHas) {
@@ -1066,7 +1064,7 @@ const fightOrFlight = () => {
         <div id="run-away" class="button">RUN AWAY!</div>
         <div id="surrender" class="button">Surrender</div>`
 
-    
+
     muggingInfoHolder.innerHTML = `
         <p>On your way out of the subway, you got mugged!</p>
         <br/>
@@ -1124,8 +1122,6 @@ const fightBack = (shots, bestWeaponHeld) => {
         shotOrShots = "shot"
     }
 
-    
-
     fightBackInfoHolder.innerHTML = ``;
     fightBackInfoHolder.innerHTML = `<br/><p>You can take ${shots} ${shotOrShots}.</p>`
 
@@ -1133,9 +1129,10 @@ const fightBack = (shots, bestWeaponHeld) => {
 
     for (let attempt = 0; attempt < shots; attempt++) {
         console.log("Shot Atempt: " + attempt);
-        fightBackInfoHolder.innerHTML += `<p>BLAM!!</p>`
+        fightBackInfoHolder.innerHTML += `<br/><p>BLAM!!</p>`
         let accuracy = Random.int(0, 100) //roll a random shot value
         let hitThreshold = 25;
+
         if (accuracy < hitThreshold) {
 
             playerHitTarget = true;
@@ -1149,7 +1146,7 @@ const fightBack = (shots, bestWeaponHeld) => {
             let rnd = Random.int(0, insultList.length - 1);
 
             fightBackInfoHolder.innerHTML += `
-                <br/><p>You hit that ${insultList[rnd]}!<br/> You were able to get away.</p><br/>
+                <br/><p>You hit that ${insultList[rnd]}!<br/><br/> You were able to get away.</p><br/>
                 <div id="continue-after-fight-button" class="button">Serves him right! (continue)</div>`
 
             const continueAfterFightButton = document.querySelector("#continue-after-fight-button");
@@ -1162,7 +1159,7 @@ const fightBack = (shots, bestWeaponHeld) => {
 
             break
         } else { 
-            fightBackInfoHolder.innerHTML += `<br/><p>Oh, damn. You missed!</p>`
+            fightBackInfoHolder.innerHTML += `<p>Oh, damn. You missed!</p>`
             
             console.log("shot #" + attempt + " missed!")
         }
@@ -1171,7 +1168,7 @@ const fightBack = (shots, bestWeaponHeld) => {
     if (!playerHitTarget) {
         setTimeout(() => {
             getShotAt();
-        }, 10)
+        }, 100)
         
     }
     
@@ -1180,6 +1177,7 @@ const fightBack = (shots, bestWeaponHeld) => {
 const runAway = () => {
     const muggingButtonsHolder = document.querySelector("#mugging-buttons")
     muggingInfoHolder.innerHTML = `<h4>RUN AWAY!</h4>`
+    fightBackInfoHolder.innerHTML = ``;
 
     //these 3 params determine how the chase goes
     let catchThreshold = 25; // % chance that the mugger will catch the player and proceed to the mugging screen
@@ -1206,9 +1204,9 @@ const runAway = () => {
     //then we check to see if they are still chasing the player
     let persistenceChance = Random.int(0, 100);
     if (persistenceChance < persistanceThreshold) {
-        muggingInfoHolder.innerHTML += `<br/><p>He's still chasing you! What are you gonna do?</p>`
+        fightBackInfoHolder.innerHTML += `<br/><p>He's still chasing you! What are you gonna do?</p>`
     } else {
-        muggingInfoHolder.innerHTML += `<br/><p>You got away!</p><br/>`
+        fightBackInfoHolder.innerHTML += `<br/><p>You got away!</p><br/>`
         muggingButtonsHolder.innerHTML = `<div id="continue" class="button">Oh, thank goodness. (continue)</div>`
 
         const continueButton = document.querySelector("#continue");
@@ -1222,6 +1220,7 @@ const runAway = () => {
 
 const getShotAt = () => {
     //if they didn't catch the player, mugger takes a shot at the player. Chance to lose HP
+    console.log("getting shot at");
     let shotChance = Random.int(0, 100);
     let shotHitThreshold = 50; // assuming the mugger doesn't catch the player, they shoot at the player. This is the % chance that they hit
     
@@ -1466,7 +1465,7 @@ printWelcomeMessage(); //put the intro message on the screen
 //add json info - both in the drug category and then again in the inventory (you should probably generate the inventory dynamically based on a forEach of the names of the drugs in the drug list)
 
 //TODO:
-//the bones upgrade shop and gun shop are in place. Flesh them out
+//the bones upgrade shop and are in place. Flesh them out
 //it's possible to have tony find you and get mugged at the same time. Make that not be possible
 //Add the county office where you can pay off the loan on grandma's house
 //add auto save functionality
@@ -1475,4 +1474,3 @@ printWelcomeMessage(); //put the intro message on the screen
 //add cops that chase you. More chance to get chased the more profit you make
 //add a "highest / lowest" seen thing on the market
 //add a shop so you can get some upgrades e.g. weapons and inventory
-//add a mugging / police chase mini game inside of fightOrFlight()
