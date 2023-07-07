@@ -225,6 +225,8 @@ const hospitalInfoHolder = document.querySelector("#hospital-info")
 //define a place to print thee gun shop info + buttons
 const gunShopInfoHoldder = document.querySelector("#gun-shop-info")
 
+const fightBackInfoHolder = document.querySelector("#fight-back-info");
+
 //bank withdraw buttons
 const withdraw10 = document.querySelector("#withdraw-10");
 const withdraw25 = document.querySelector("#withdraw-25");
@@ -914,11 +916,13 @@ const goUpsideYourHead = () => {
         const means = ["a tire iron", "a 5 iron", "a baseball bat", "these brass knuckes", "my size 13 boots"]
         let rnd = Random.int(0, means.length - 1);
         console.log(means[rnd] + " Rnd: " + rnd)
+        let damage = Random.int(10,50)
         let upsideHead = `
             <p>Sorry, kid," Sal says, "But Tony expects his money. So I'm gonna have to go upside your head with ${means[rnd]} now. Nothing personal.</p><br/>
-            <div id="continue-after-mob-hit" class="button" >"Ouch!" (-55 health) <br/>"Was that really necessary, man?" (continue)</div>`
+            <div id="continue-after-mob-hit" class="button" >"Ouch!" (-${damage} HP) <br/>"Was that really necessary, man?" (continue)</div>`
 
-        health -= 55;
+
+        health -= damage;
         
         updateInfoPanelStats();
 
@@ -991,15 +995,20 @@ const withdraw = percent => {
 //you should also bake the police chase trigger into this method
 const checkForMugging = () => {
 
-    let cashFactor = cash / 1000;
+    let cashFactor = cash / 1500;
     let inventoryFactor = countHeld / 4;
     let muggingChanceScore = cashFactor + inventoryFactor; //this factor determines how likely the player is to get mugged. The idea is to have money and stash contribute to the chance, but without making it too overpowered.
-    if (muggingChanceScore > 90) {
-        muggingChanceScore = 90;
+    if (muggingChanceScore > 60) {
+        muggingChanceScore = 60;
     }
 
+    if (muggingChanceScore < 5) {
+        muggingChanceScore = 5;
+    }
+
+    muggingChanceScore = 100;
     
-    let mugChance = Random.int(10, 100);
+    let mugChance = Random.int(0, 100);
     console.log("Mugging CashFactor: " + cashFactor + " InventoryFactor: " + inventoryFactor);
     console.log("Mugging Liklihood: " + muggingChanceScore + " Roll For Mugging: " + mugChance);
     if (mugChance < muggingChanceScore) {
@@ -1025,13 +1034,14 @@ const fightOrFlight = () => {
         });
     }, 0)
 
-
+    let ammo = 0;
     let canYouFightString = ``;
     let bestWeaponHeld = ""
     let yourOptionsAre = ``;
+    let fightString = ``;
     console.log(bestWeaponHeld)
     if (playerHasWeapon) {
-        let ammo = 0;
+        
 
         //figure out the best weapon that the player is carrying and determine how many shots it gives the player
         weapons.forEach(weapon => {
@@ -1041,8 +1051,9 @@ const fightOrFlight = () => {
             }
         })
 
+        console.log("You've got this many shots: " + ammo)
         canYouFightString = `<p>Good thing you're armed with your trusty ${bestWeaponHeld}.</p>`
-        yourOptionsAre = `<div id="fight" class="button">Shoot his ass!</div>`
+        fightString = `<div id="fight" class="button">Shoot his ass!</div>`
 
     } else {
         canYouFightString = `<p>And you are unarmed!</p>`
@@ -1051,7 +1062,7 @@ const fightOrFlight = () => {
     yourOptionsAre += `
         <br/>
         <h4>Your Options are:</h4>    
-        
+        ${fightString}
         <div id="run-away" class="button">RUN AWAY!</div>
         <div id="surrender" class="button">Surrender</div>`
 
@@ -1063,6 +1074,7 @@ const fightOrFlight = () => {
 
     //create a reference to the mugging button parent object
     const muggingButtonsHolder = document.querySelector("#mugging-buttons")
+    muggingButtonsHolder.classList.remove("hide");
     muggingButtonsHolder.innerHTML = yourOptionsAre
     muggingPanel.classList.remove("hide");
     //running away has 3 possible outcomes: failure (mugged) / partial success (you drop drugs) / success (you escape with no loss)
@@ -1075,7 +1087,8 @@ const fightOrFlight = () => {
     //add listeners to the fight or flight options buttons. The "fight" button will only exist when the player has a weapon in their inventory
     try {
         fightButton.addEventListener("click", event => {
-            console.log("fight button clicked")
+            console.log("fight button clicked");
+            fightBack(ammo, bestWeaponHeld);
         })
     } catch {
         console.log("there's no fight button to add an event listner to")
@@ -1102,14 +1115,82 @@ const fightOrFlight = () => {
     
 }
 
+const fightBack = (shots, bestWeaponHeld) => {
+    console.log("fighting back. You're gonna take " + shots + " shots")
+    let shotOrShots = "";
+    if (shots > 1) {
+        shotOrShots = "shots"
+    } else {
+        shotOrShots = "shot"
+    }
+
+    
+
+    fightBackInfoHolder.innerHTML = ``;
+    fightBackInfoHolder.innerHTML = `<br/><p>You can take ${shots} ${shotOrShots}.</p>`
+
+    let playerHitTarget = false;
+
+    for (let attempt = 0; attempt < shots; attempt++) {
+        console.log("Shot Atempt: " + attempt);
+        fightBackInfoHolder.innerHTML += `<p>BLAM!!</p>`
+        let accuracy = Random.int(0, 100) //roll a random shot value
+        let hitThreshold = 25;
+        if (accuracy < hitThreshold) {
+
+            playerHitTarget = true;
+            console.log("shot #" + attempt + "hit him!");
+            console.log("you got away!")
+
+            const muggingButtonsHolder = document.querySelector("#mugging-buttons")
+            muggingButtonsHolder.classList.add("hide"); //hide the "your options are" panel, because the player just got away
+
+            const insultList = ["piece of shit", "son of a bitch", "mother fucker", "asshole"]
+            let rnd = Random.int(0, insultList.length - 1);
+
+            fightBackInfoHolder.innerHTML += `
+                <br/><p>You hit that ${insultList[rnd]}!<br/> You were able to get away.</p><br/>
+                <div id="continue-after-fight-button" class="button">Serves him right! (continue)</div>`
+
+            const continueAfterFightButton = document.querySelector("#continue-after-fight-button");
+            continueAfterFightButton.addEventListener("click", event => {
+                fightBackInfoHolder.innerHTML = "";
+
+                muggingPanel.classList.add("hide");
+                activityButtonHolder.classList.remove("hide");
+            })
+
+            break
+        } else { 
+            fightBackInfoHolder.innerHTML += `<br/><p>Oh, damn. You missed!</p>`
+            
+            console.log("shot #" + attempt + " missed!")
+        }
+    }
+
+    if (!playerHitTarget) {
+        setTimeout(() => {
+            getShotAt();
+        }, 10)
+        
+    }
+    
+}
+
 const runAway = () => {
     const muggingButtonsHolder = document.querySelector("#mugging-buttons")
     muggingInfoHolder.innerHTML = `<h4>RUN AWAY!</h4>`
+
+    //these 3 params determine how the chase goes
+    let catchThreshold = 25; // % chance that the mugger will catch the player and proceed to the mugging screen
+    
+    let persistanceThreshold = 50; // finally this is the % chance that the mugger keeps chasing the player
+
     //see if the mugger caught the player
     let catchChance = Random.int(0, 100);
     console.log("player is running away")
     muggingInfoHolder.innerHTML += `<br/><p>You turn and run like hell!</p>`
-    if (catchChance > 60) {
+    if (catchChance < catchThreshold) {
         console.error("mugger caught the player")
         muggingInfoHolder.innerHTML += `</br><p>But you were not fast enough...</p>`
         
@@ -1118,25 +1199,13 @@ const runAway = () => {
         return
     }
 
-    //if they didn't catch the player, mugger takes a shot at the player. Chance to lose HP
-    let shotChance = Random.int(0, 100);
+    //the mugger (and possibly later police officer?) shoots at the player
+    getShotAt();
 
-    muggingInfoHolder.innerHTML += `<br/><p>You hear the sound gunfire behind you</p>`
-
-    console.log("mugger is shooting at the player")
-    if (shotChance > 60) {
-        console.error("player got shot!")
-        let damage = Random.int(10, 25);
-        muggingInfoHolder.innerHTML += `<br/><p>You're hit! Ouch! -${damage} HP</p>`
-        health -= damage
-        updateInfoPanelStats();
-    } else {
-        muggingInfoHolder.innerHTML += `<br/><p>But that son of a bitch missed!</p>`
-    }
-
+    
     //then we check to see if they are still chasing the player
     let persistenceChance = Random.int(0, 100);
-    if (persistenceChance > 60) {
+    if (persistenceChance < persistanceThreshold) {
         muggingInfoHolder.innerHTML += `<br/><p>He's still chasing you! What are you gonna do?</p>`
     } else {
         muggingInfoHolder.innerHTML += `<br/><p>You got away!</p><br/>`
@@ -1149,6 +1218,26 @@ const runAway = () => {
         })
     }
     
+}
+
+const getShotAt = () => {
+    //if they didn't catch the player, mugger takes a shot at the player. Chance to lose HP
+    let shotChance = Random.int(0, 100);
+    let shotHitThreshold = 50; // assuming the mugger doesn't catch the player, they shoot at the player. This is the % chance that they hit
+    
+
+    fightBackInfoHolder.innerHTML += `<br/><p>Look out! They're shooting at you!</p>`
+
+    console.log("mugger is shooting at the player")
+    if (shotChance < shotHitThreshold) {
+        console.error("player got shot!")
+        let damage = Random.int(10, 25);
+        fightBackInfoHolder.innerHTML += `<br/><p>You're hit! Ouch! -${damage} HP</p>`
+        health -= damage
+        updateInfoPanelStats();
+    } else {
+        fightBackInfoHolder.innerHTML += `<br/><p>But that son of a bitch missed!</p>`
+    }
 }
 
 //handles mugging info
@@ -1289,10 +1378,10 @@ const visitGunShop = () => {
         //but only if the player doesn't already have that gun in their possession
         let playerHas = false;
         playerHas = gun.playerHas;
-        console.log(gun);
-        console.log(playerHas)
+        //console.log(gun);
+        //console.log(playerHas)
         if (gun.playerHas !== true) {
-            console.log(gun.name + " " + gun.cost)
+            //console.log(gun.name + " " + gun.cost)
             gunShopInfoHoldder.insertAdjacentHTML("beforeend", `
         <div id="buy-${gun.id}" class="button justify-content-space-between padding-inline-5"><h2>${gun.name.toUpperCase()}</h2><h2>$${gun.cost.toLocaleString(undefined, { useGrouping: true })}</h2></div>
         `)
