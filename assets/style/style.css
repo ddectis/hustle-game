@@ -113,9 +113,9 @@ body {
 }
 
 .button {
-    border: solid 2px #6cda82;
+    solid 2px #498154;
     padding-inline: 1%;
-    padding-block: 5px;
+    padding-block: 2px;
     border-radius: 5px;
     text-align: center;
     background-color: #6cda82;
@@ -127,8 +127,9 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    box-shadow: #498154 3px 5px 0px;
 }
-}
+
 
 .button :hover{
     text-decoration:none;
@@ -172,7 +173,7 @@ a{
     
     flex-direction: column;
     align-items: flex-start;
-    padding-top:10%;
+    padding-top:20%;
     width:100%;
     
 }
@@ -213,6 +214,8 @@ a{
     width: 100%;
     padding-block: 10px;
     flex-direction: column;
+    align-items: center;
+
 }
 
 
@@ -240,7 +243,9 @@ a{
     padding:5px;
 }
 
+#county-info{
 
+}
 
 .drug-deal {
     outline: 3px double #6cda82;
@@ -347,16 +352,24 @@ a{
     width:100%;
 }
 
-.padding-bottom-4 {
-    padding-bottom: 4%;
+.max-width-66{
+    max-width:66%;
+}
+
+.padding-bottom-10 {
+    padding-bottom: 10px;
 }
 
 .padding-top-8{
     padding-top: 8%;
 }
 
-.hide {
-    display: none
+.padding-block-5{
+    padding-block:5px;
+}
+
+.margin-bottom-10{
+    margin-bottom:10px;
 }
 
 .Cannabis-bg {
@@ -403,23 +416,33 @@ a{
     justify-content: space-around;
 }
 
-@media screen and (min-width:500px){
-    p{
-        font-size:1.15em;
+#county-info {
+    max-width: 95%;
+}
+
+.hide {
+    display: none
+}
+
+@media screen and (min-width:450px){
+    .actions-holder{
+        padding-top: 14%;
     }
+    
+}
+
+@media screen and (min-width: 650px) {
 
     .ui-and-status {
         flex-direction: row;
     }
 
-    .ui-parent{
-        padding-top:1%;
+    .ui-parent {
+        padding-top: 1%;
     }
-}
 
-@media screen and (min-width: 600px) {
     h2{
-        font-size:2em;
+        font-size:1.7em;
     }
 
     h3{
@@ -444,8 +467,12 @@ a{
         
     }
 
+    .actions-holder{
+        padding-top:11%;
+    }
+
     .ui-holder {
-        padding-block: 10px;
+        /*padding-block: 10px;*/
     }
 
 
@@ -463,12 +490,37 @@ a{
     
 }
 
+@media screen and (min-width: 800px){
+    p {
+        font-size: 1.15em;
+    }
+    #county-info {
+        max-width:75%;
+    }
+}
+
 @media screen and (min-width: 1000px) {
-    
+    p {
+        font-size: 1.35em;
+    }
     .drug-deal {
         
     }
     .drug-name {
         
     }
+    .title-rotate {
+        transform: rotate(0deg);
+    }
+
+    .actions-holder{
+        padding-top:14%;
+    }
 }
+
+@media screen and (min-width: 1000px) {
+    .actions-holder{
+        padding-top: 9%;
+    }
+}
+

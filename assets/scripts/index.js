@@ -49,10 +49,21 @@ const countyPanel = document.querySelector("#county-panel");
 
 const topPanel = document.querySelector("#top-panel");
 
+//define a place to print the panel info for each action panel panel
+const stashInfoHolder = document.querySelector("#stash-info");
+const loanInfoHolder = document.querySelector("#loan-info")
+const bankInfoHolder = document.querySelector("#bank-info")
+const muggingInfoHolder = document.querySelector("#mugging-info")
+const hospitalInfoHolder = document.querySelector("#hospital-info")
+const gunShopInfoHoldder = document.querySelector("#gun-shop-info")
+const fightBackInfoHolder = document.querySelector("#fight-back-info");
+const countyInfoHolder = document.querySelector("#county-info");
+
+
 //this array refers to each of the panels. This is used to show / hide each panel on button clicks
 //this array deliberately doesn't contain the lookingForYouPanel because that panel is handled differently i.e. it is triggered by game conditions and not from the player's actions
 //i.e. this array contains all of the panels that the player can choose to activate. Panels which aren't activated by the player should not be placed in this array
-const activityPanels = [travelPanel, dealPanel, loanPanel, bankPanel, stashPanel, hospitalPanel,upgradeShopPanel,gunShopPanel];
+const activityPanels = [travelPanel, dealPanel, loanPanel, bankPanel, stashPanel, hospitalPanel,upgradeShopPanel,gunShopPanel,countyPanel];
 
 //create references to action screens that the player cannot activate i.e. that trigger from game states
 const lookingForYouPanel = document.querySelector("#looking-for-you-panel")
@@ -126,7 +137,8 @@ gunShopActivityButton.addEventListener("click", event => {
 countyActivytButton.addEventListener("click", event => {
     console.log("county office clicked");
     hideAllActionPanels();
-    lookingForYouPanel.classList.add("hide");
+    
+    visitCountyOffice();
     countyPanel.classList.remove("hide");
 })
 
@@ -218,25 +230,6 @@ let cannabisCountElement = "";
 let shroomsCountElement = "";
 let boozeCountElement = "";
 
-//define a place to print the stash info
-const stashInfoHolder = document.querySelector("#stash-info");
-
-//define a place to print loanshark info
-const loanInfoHolder = document.querySelector("#loan-info")
-
-//define a place to print the bank account info
-const bankInfoHolder = document.querySelector("#bank-info")
-
-//define a place to print the mugging status + minigame
-const muggingInfoHolder = document.querySelector("#mugging-info")
-
-//define a place to print the hospital info + buttons
-const hospitalInfoHolder = document.querySelector("#hospital-info")
-
-//define a place to print thee gun shop info + buttons
-const gunShopInfoHoldder = document.querySelector("#gun-shop-info")
-
-const fightBackInfoHolder = document.querySelector("#fight-back-info");
 
 //bank withdraw buttons
 const withdraw10 = document.querySelector("#withdraw-10");
@@ -336,7 +329,7 @@ const loadObjectsJSON = async() => {
             console.log("Createing Travel Button for: " + burrough.name)
             //create a button for each burrough
             travelButtonHolder.insertAdjacentHTML("beforeend",
-                `<div class="button" id="${burrough.name.toLowerCase()}-button">Travel to ${burrough.name}`)
+                `<div class="button padding-block-5" id="${burrough.name.toLowerCase()}-button">Travel to ${burrough.name}`)
             
         })
 
@@ -562,14 +555,14 @@ const randomizeDrugPrices = () => {
         console.log(drug.name + " price index: " + priceRandomizer)
         if (priceRandomizer <= 1) {
             console.log(drug.name + " price crash!")
-            drugPriceNewsString += `<p>${drug.name} prices have crashed!</p>`
+            drugPriceNewsString += `<br/><p><b><u>${drug.name} prices have crashed!</u></b></p>`
             maxPrice = minPrice; //make the old minimum be the new maximum
             minPrice *= 0.33; //and then decrease the minimum
             
         }
         if (priceRandomizer >= 99) {
             console.log(drug.name + " price skyrockets!")
-            drugPriceNewsString += `<p>${drug.name} price are very high!</p>`
+            drugPriceNewsString += `<br/><p><b><u>${drug.name} prices have skyrocketed!</u></b></p>`
             minPrice = maxPrice; //make the old max the new min 
             maxPrice *= 2;   //and define and even lower new min value
         }
@@ -603,9 +596,9 @@ const initializeDrugList= () => {
             `<div id="${drug.name}-deal" class="drug-deal">
                 <h4 class="drug-name ${drug.name}-bg"> ${drug.name}</h3>
                 <div class="flex width-100">
-                    <div id="${drug.id}-buy" class="button height-50">Buy</div>
+                    <div id="${drug.id}-buy" class="button height-50 margin-bottom-10">Buy</div>
                     <div id=${drug.name}-price class="drug-listing width-100"><div class="flex"><h3>$${drug.buyPrice}</h3><div class="flex"></div><h3>$${drug.sellPrice}</h3></div><h3>Holding: </h3><h3 id="${drug.id}-held">0</h3></div>
-                    <div id="${drug.id}-sell" class="button height-50">Sell</div>
+                    <div id="${drug.id}-sell" class="button height-50 margin-bottom-10">Sell</div>
                 </div>
             </div>`);
 
@@ -989,7 +982,7 @@ const goUpsideYourHead = () => {
         //the player will need to click the continue button in order to proceed away from this screen.
         const continueButton = document.querySelector("#continue-after-mob-hit");
         continueButton.addEventListener("click", () => {
-            checkHealth(); //we check to see if the player has died before moving on
+            checkHealth(`Sal the enforcer went upside your head with his ${means[rnd]}`); //we check to see if the player has died before moving on
 
             //and turn the activity buttons back on if the player has not died
             i
@@ -999,16 +992,26 @@ const goUpsideYourHead = () => {
 
 }
 
-const checkHealth = () => {
+const checkHealth = causeOfPain => {
     if (health <= 0) {
+        //the death message gets printed in the status panel which hitherto had been stuck to the top of the page. Bring it back into the middle for the death message
+        topPanel.classList.remove("sticky-div") 
+
         //hide the UI Info Panel
         infoPanel.classList.add("hide");
+
         //as well as the UI Action Panel
         actionPanel.classList.add("hide");
         dealPanel.classList.add("hide");
+
+        //define the death message and print it at the same time
         statusMessageHolder.innerHTML = `
-            <p>You died on day ${day}. Tough luck.</p>
-            <div id="restart-game" class="button">Play Again</div> 
+            <p>You died on day ${day}. </p>
+            <br/><p>Cause of death: ${causeOfPain}.</p>
+            <br/><p>Tough luck. Grandma lost the house and you lost your life.</p>
+            <br/><p>Your attempt was a total failure.</p>
+            <br/><p>Also those puppies and kitties were counting on YOU, man!</p>
+            <br/><div id="restart-game" class="button">I think you'd better try again</div> 
             `
         //grab a reference to the button you just created and then add a listener to make it refresh the page on click. This is my kludgy shortcut to starting a new game :)
         const playAgainButton = document.querySelector("#restart-game");
@@ -1052,8 +1055,8 @@ const withdraw = percent => {
 //you should also bake the police chase trigger into this method
 const checkForMugging = () => {
 
-    let cashFactor = cash / 1500;
-    let inventoryFactor = countHeld / 4;
+    let cashFactor = cash / 10000; //every $10,000 in the player's inventory increases the chances of a mugging by 1%
+    let inventoryFactor = countHeld / 4; //every 4 inventory units held increases the chances of a mugging by 1%
     let muggingChanceScore = cashFactor + inventoryFactor; //this factor determines how likely the player is to get mugged. The idea is to have money and stash contribute to the chance, but without making it too overpowered.
     if (muggingChanceScore > 60) {
         muggingChanceScore = 60;
@@ -1064,10 +1067,14 @@ const checkForMugging = () => {
         muggingChanceScore = 5;
     }
 
+    //this line ensures you get mugged every time. Use only for testing. Be sure to turn off when you actually want to play the game
+    //muggingChanceScore = 100;
+    
     let mugChance = Random.int(0, 100);
     console.log("Mugging CashFactor: " + cashFactor + " InventoryFactor: " + inventoryFactor);
     console.log("Mugging Liklihood: " + muggingChanceScore + " Roll For Mugging: " + mugChance);
     if (mugChance < muggingChanceScore) {
+        activityButtonHolder.classList.add("hide");
         fightOrFlight();
     }
 }
@@ -1274,7 +1281,7 @@ const runAway = () => {
 
         const continueButton = document.querySelector("#continue");
         continueButton.addEventListener("click", event => {
-            activityButtonHolder    .classList.remove("hide");
+            activityButtonHolder.classList.remove("hide");
             muggingPanel.classList.add("hide");
         })
     }
@@ -1296,6 +1303,7 @@ const getShotAt = () => {
         let damage = Random.int(10, 25);
         fightBackInfoHolder.innerHTML += `<br/><p>You're hit! Ouch! -${damage} HP</p>`
         health -= damage
+        checkHealth(`A mugger shot you to death. Then he took all your drugs and money`); //pass in a string to use for the cause of death
         updateInfoPanelStats();
     } else {
         fightBackInfoHolder.innerHTML += `<br/><p>But that son of a bitch missed!</p>`
@@ -1305,8 +1313,6 @@ const getShotAt = () => {
 //handles mugging info
 const playerMugged = () => {
     console.error("oh shit! You're getting mugged!");
-        
-    
 
     let totalLoss = 0;
 
@@ -1314,7 +1320,8 @@ const playerMugged = () => {
     for (const drug in inventory) {
         //console.log("Drug Name: " + drug + " " + inventory[drug].count)
         if (inventory[drug].count > 0) {
-            let loss = Math.round(inventory[drug].count * 0.5);
+            let lossFactor = Random.float(0.1, 0.6); //the muggers are going to take 10-60% of your stash of each drug
+            let loss = Math.round(inventory[drug].count * lossFactor);
             totalLoss += loss;
             inventory[drug].count -= loss;
             console.log(drug + " loss: " + loss)
@@ -1338,7 +1345,7 @@ const playerMugged = () => {
         
         <br/><p>Those bastards took ${totalLoss} units from your stash</p>
         <p>You lost ${damage} HP in the struggle</p>
-        <p>They also took $${robbedTotal.toLocaleString(undefined, { useGrouping: true })} from your bill fold.</p>
+        <p>They also took $${robbedTotal.toLocaleString(undefined, { useGrouping: true })} from your bill fold before you managed to get away.</p>
         <br/>
         <div id="continue-from-mugging" class="button">Well, that sucked. (continue)</div>`
     
@@ -1402,7 +1409,7 @@ const visitHospital = () => {
     <div class="padding-bottom-4">
         <h2>${burroughs[currentLocation].name} Medical</h2>
     </div>
-    <p>If you have $$$ we have HP. If you're broke, fuck off! What, you think healthcare is a human right of something?*</p>
+    <br/><p>If you have $$$ we have HP. If you're broke, fuck off! What, you think healthcare is a human right of something?*</p>
     <br/>
     <p>The doc takes one look at you and says, "${appraisalString}."</p>
     <br/>
@@ -1517,6 +1524,27 @@ const visitGunShop = () => {
     }
 }
 
+const visitCountyOffice = () => {
+    console.log("visiting county office")
+
+    //define the message that prints when the player goes to the count office
+    let countyMessage = `
+        <br /><p>As you walk up to the service window inside the stodgy government office building, a surly clerk looks you up and down and says:<br/><br/> "You want my assessment? Fire your stylist. What do you want?"</p>
+        <br /><p>You explain that you're here to pay the back taxes on your Grandmother's combination orphanage and animal rescue.</p>
+        <br/><br/><p>The clerk clacks the keys on the ancient terminal in front of him to pull up Grandma's info. The clerk looks back at you with a straight face and says:<br/><br/> "That'll be one million dollars. We can only accept payment in full. Will that be check or credit?"</p>
+        `
+
+    //check to see if the player has sufficient moneys to pay off the taxes
+    if (cash > 1000000) {
+        countyMessage += `<div id="pay-taxes" class="button">Uhhh...cash </div>`
+        const payTaxesButton = document.querySelector("#pay-taxes");
+        payTaxesButton.addEventListener("click", event => {
+
+        })
+    }
+    countyInfoHolder.innerHTML = countyMessage;
+}
+
 //this logic runs on page load
 loadObjectsJSON(); //and load the JSON objects for things like locations
 printWelcomeMessage(); //put the intro message on the screen
@@ -1528,6 +1556,8 @@ printWelcomeMessage(); //put the intro message on the screen
 //add json info - both in the drug category and then again in the inventory (you should probably generate the inventory dynamically based on a forEach of the names of the drugs in the drug list)
 
 //TODO:
+
+
 //flesh out the end of game screen
 //the bones upgrade shop and are in place. Flesh them out
 //make the value of your inventory (as opposed to the overall count) contribute more to your chance of getting mugged
