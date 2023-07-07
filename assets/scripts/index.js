@@ -101,6 +101,7 @@ viewStashButton.addEventListener("click", event => {
 hospitalActivityButton.addEventListener("click", event => {
     console.log("hospital button clicked")
     hideAllActionPanels();
+    lookingForYouPanel.classList.add("hide");
     visitHospital();
     hospitalPanel.classList.remove("hide");
     
@@ -109,11 +110,13 @@ hospitalActivityButton.addEventListener("click", event => {
 upgradeShopActivityButton.addEventListener("click", event => {
     console.log("upgrade shop button clicked")
     hideAllActionPanels();
+    lookingForYouPanel.classList.add("hide");
     upgradeShopPanel.classList.remove("hide");
 });
 gunShopActivityButton.addEventListener("click", event => {
     console.log("gun shop button clicked")
     hideAllActionPanels();
+    lookingForYouPanel.classList.add("hide");
     visitGunShop();
     gunShopPanel.classList.remove("hide");
 });
@@ -306,6 +309,7 @@ const loadObjectsJSON = async() => {
         drugs = objects.drugs;
         inventory = objects.playerInfo.inventory;
         weapons = objects.weapons;
+        console.log(objects.weapons[0]);
 
         console.log(inventory);
         console.log(burroughs)
@@ -984,7 +988,7 @@ const withdraw = percent => {
     visitBank();
 }
 
-
+//you should also bake the police chase trigger into this method
 const checkForMugging = () => {
 
     let cashFactor = cash / 1000;
@@ -993,6 +997,7 @@ const checkForMugging = () => {
     if (muggingChanceScore > 90) {
         muggingChanceScore = 90;
     }
+
     
     let mugChance = Random.int(10, 100);
     console.log("Mugging CashFactor: " + cashFactor + " InventoryFactor: " + inventoryFactor);
@@ -1002,13 +1007,91 @@ const checkForMugging = () => {
     }
 }
 
-//leave room to create extra logic to allow the player to fight back or escape
+//logic to allow the player to fight back or escape
 
 const fightOrFlight = () => {
     //placeholder pass through function for now
-    playerMugged(); //remove me
+    //playerMugged(); //remove me
 
+    //check to see if the player has any weapons
+    const playerHasWeapon = weapons.some((weapon) => weapon.playerHas === true);
+    console.log("Player Has Weapon? " + playerHasWeapon);
+
+    setTimeout(() => {
+        activityButtonHolder.classList.add("hide")
+        activityPanels.forEach(panel => {
+            console.log("mugging you so hiding all the panels")
+            panel.classList.add("hide");
+        });
+    }, 0)
+
+
+    let canYouFightString = ``;
+    let bestWeaponHeld = ""
+    let yourOptionsAre = ``;
+    console.log(bestWeaponHeld)
+    if (playerHasWeapon) {
+        let ammo = 0;
+
+        //figure out the best weapon that the player is carrying and determine how many shots it gives the player
+        weapons.forEach(weapon => {
+            if (weapon.playerHas) {
+                bestWeaponHeld = weapon.name;
+                ammo = weapon.shots;
+            }
+        })
+
+        canYouFightString = `<p>Good thing you're armed with your trusty ${bestWeaponHeld}.</p>`
+        yourOptionsAre = `<div id="fight" class="button">Shoot his ass!</div>`
+
+    } else {
+        canYouFightString = `<p>And you are unarmed!</p>`
+    }
+
+    yourOptionsAre += `
+        <br/>
+        <h4>Your Options are:</h4>    
+        
+        <div id="run-away" class="button">RUN AWAY!</div>
+        <div id="surrender" class="button">Surrender</div>`
+
+    
+    muggingInfoHolder.innerHTML = `
+        <p>On your way out of the subway, you got mugged!</p>
+        <br/>
+        ${canYouFightString}`
+
+    //create a reference to the mugging button parent object
+    const muggingButtonsHolder = document.querySelector("#mugging-buttons")
+    muggingButtonsHolder.innerHTML = yourOptionsAre
+    muggingPanel.classList.remove("hide");
     //running away has 3 possible outcomes: failure (mugged) / partial success (you drop drugs) / success (you escape with no loss)
+
+    //create references to the fight / flight option buttons
+    const fightButton = document.querySelector("#fight");
+    const runButton = document.querySelector("#run-away")
+    const surrenderButton = document.querySelector("#surrender")
+
+    //add listeners to the fight or flight options buttons. The "fight" button will only exist when the player has a weapon in their inventory
+    try {
+        fightButton.addEventListener("click", event => {
+            console.log("fight button clicked")
+        })
+    } catch {
+        console.log("there's no fight button to add an event listner to")
+    }
+
+    runButton.addEventListener("click", event => {
+        
+        console.log("run away button clicked")
+        runAway();
+    })
+
+    surrenderButton.addEventListener("click", event => {
+        muggingButtonsHolder.innerHTML = ""; //clear the "your options are" buttons because the player just surrendered
+        playerMugged();
+        console.log("surrender button clicked")
+    })
 
 
     //fighting back will see the player shoot at the assailant and the assailtn attack the player in return.
@@ -1019,20 +1102,64 @@ const fightOrFlight = () => {
     
 }
 
+const runAway = () => {
+    const muggingButtonsHolder = document.querySelector("#mugging-buttons")
+    muggingInfoHolder.innerHTML = `<h4>RUN AWAY!</h4>`
+    //see if the mugger caught the player
+    let catchChance = Random.int(0, 100);
+    console.log("player is running away")
+    muggingInfoHolder.innerHTML += `<br/><p>You turn and run like hell!</p>`
+    if (catchChance > 60) {
+        console.error("mugger caught the player")
+        muggingInfoHolder.innerHTML += `</br><p>But you were not fast enough...</p>`
+        
+        muggingButtonsHolder.innerHTML = "";
+        playerMugged();
+        return
+    }
+
+    //if they didn't catch the player, mugger takes a shot at the player. Chance to lose HP
+    let shotChance = Random.int(0, 100);
+
+    muggingInfoHolder.innerHTML += `<br/><p>You hear the sound gunfire behind you</p>`
+
+    console.log("mugger is shooting at the player")
+    if (shotChance > 60) {
+        console.error("player got shot!")
+        let damage = Random.int(10, 25);
+        muggingInfoHolder.innerHTML += `<br/><p>You're hit! Ouch! -${damage} HP</p>`
+        health -= damage
+        updateInfoPanelStats();
+    } else {
+        muggingInfoHolder.innerHTML += `<br/><p>But that son of a bitch missed!</p>`
+    }
+
+    //then we check to see if they are still chasing the player
+    let persistenceChance = Random.int(0, 100);
+    if (persistenceChance > 60) {
+        muggingInfoHolder.innerHTML += `<br/><p>He's still chasing you! What are you gonna do?</p>`
+    } else {
+        muggingInfoHolder.innerHTML += `<br/><p>You got away!</p><br/>`
+        muggingButtonsHolder.innerHTML = `<div id="continue" class="button">Oh, thank goodness. (continue)</div>`
+
+        const continueButton = document.querySelector("#continue");
+        continueButton.addEventListener("click", event => {
+            activityButtonHolder    .classList.remove("hide");
+            muggingPanel.classList.add("hide");
+        })
+    }
+    
+}
+
 //handles mugging info
 const playerMugged = () => {
     console.error("oh shit! You're getting mugged!");
         
-    setTimeout(() => {
-        activityButtonHolder.classList.add("hide")
-        activityPanels.forEach(panel => {
-            console.log("mugging you so hiding all the panels")
-            panel.classList.add("hide");
-        });
-    }, 0)
+    
 
     let totalLoss = 0;
 
+    //go through each drug in the inventory and take half of it away (maybe make this random instead of hardcoded to 0.5)
     for (const drug in inventory) {
         //console.log("Drug Name: " + drug + " " + inventory[drug].count)
         if (inventory[drug].count > 0) {
@@ -1042,8 +1169,11 @@ const playerMugged = () => {
             console.log(drug + " loss: " + loss)
         }
     }
+
+    //subtract the total drugs lost in the mugging from the inventory count
     countHeld -= totalLoss;
 
+    //randomize an amount of cash to lose in the mugging
     let percentRobbed = Random.float(0.33, 0.66);
     let robbedTotal = Math.round(cash * percentRobbed)
     
@@ -1052,14 +1182,15 @@ const playerMugged = () => {
     let damage = Random.int(5, 50);
     health -= damage;
 
-    muggingInfoHolder.innerHTML = `
-        <p>On your way out of the subway, you got mugged!</p>
-        <p>Those bastards took ${totalLoss} units from your stash</p>
+    //print info about the outcome
+    muggingInfoHolder.innerHTML += `
+        
+        <br/><p>Those bastards took ${totalLoss} units from your stash</p>
         <p>You lost ${damage} HP in the struggle</p>
         <p>They also took $${robbedTotal.toLocaleString(undefined, { useGrouping: true })} from your bill fold.</p>
         <br/>
         <div id="continue-from-mugging" class="button">Well, that sucked. (continue)</div>`
-    muggingPanel.classList.remove("hide");
+    
 
     updateInfoPanelStats();
 
@@ -1152,32 +1283,87 @@ const visitHospital = () => {
 
 const visitGunShop = () => {
     console.log("visiting gun shop");
-    gunShopInfoHoldder.innerHTML = `<p>We got guns. You need guns.</p>`
+    gunShopInfoHoldder.innerHTML = ``
+    //generate a button for each gun
     weapons.forEach(gun => {
-        console.log(gun.name + " " + gun.cost)
-        gunShopInfoHoldder.insertAdjacentHTML("beforeend", `
-        <div id="buy-${gun.id}" class="button justify-content-space-between padding-inline-5"><h2>${gun.name.toUpperCase()}</h2><h2>$${gun.cost.toLocaleString(undefined, { useGrouping: true }) }</h2></div>
+        //but only if the player doesn't already have that gun in their possession
+        let playerHas = false;
+        playerHas = gun.playerHas;
+        console.log(gun);
+        console.log(playerHas)
+        if (gun.playerHas !== true) {
+            console.log(gun.name + " " + gun.cost)
+            gunShopInfoHoldder.insertAdjacentHTML("beforeend", `
+        <div id="buy-${gun.id}" class="button justify-content-space-between padding-inline-5"><h2>${gun.name.toUpperCase()}</h2><h2>$${gun.cost.toLocaleString(undefined, { useGrouping: true })}</h2></div>
         `)
+        }
+        
     })
+
+    const gunShopStatusMessage = document.querySelector("#gun-shop-status-message");
 
     const buyPistolButton = document.querySelector("#buy-pistol")
     const buyShotgunButton = document.querySelector("#buy-shotgun")
     const buyUziButton = document.querySelector("#buy-uzi")
     const buyPlasmaRifleButton = document.querySelector("#buy-plasma")
-   ;  
 
-    buyPistolButton.addEventListener("click", event => {
-        console.log(event.srcElement.id + " click")
-    })
-    buyShotgunButton.addEventListener("click", event => {
-        console.log(event.srcElement.id + " click")
-    })
-    buyUziButton.addEventListener("click", event => {
-        console.log(event.srcElement.id + " click")
-    })
-    buyPlasmaRifleButton.addEventListener("click", event => {
-        console.log(event.srcElement.id + " click")
-    })
+    //add listeners to the buy buttons, if they exist
+    try {
+        buyPistolButton.addEventListener("click", event => {
+            console.log(event.srcElement.id + " click")
+            buyGun(0)
+        })
+    } catch {
+        console.log("Buy Pistol Button doesn't exist because the player has already bought it")
+    }
+
+    try {
+        buyShotgunButton.addEventListener("click", event => {
+            console.log(event.srcElement.id + " click")
+            buyGun(1)
+        })
+    } catch {
+        console.log("Buy Shotgun Button doesn't exist because the player has already bought it")
+    }
+
+    try {
+        buyUziButton.addEventListener("click", event => {
+            console.log(event.srcElement.id + " click")
+            buyGun(2)
+        })
+    } catch {
+        console.log("Buy Uzi Button doesn't exist because the player has already bought it")
+    }
+
+    try {
+        buyPlasmaRifleButton.addEventListener("click", event => {
+            console.log(event.srcElement.id + " click")
+            buyGun(3)
+        })
+    } catch {
+        console.log("Buy Plasma Rifle doesn't exist because the player has already bought it")
+    }
+    
+    
+    
+
+    const buyGun = (gun) => {
+        
+        //check to see if the player has enough money to buy the gun
+        if (cash >= weapons[gun].cost) {
+            console.log("buying " + weapons[gun].name)
+            gunShopStatusMessage.innerHTML = `<br/><p>Enjoy your ${weapons[gun].name}. Use it in good health. <br/>Good health for you, anyway heh heh heh.`
+            cash -= weapons[gun].cost;
+            weapons[gun].playerHas = true;
+            updateInfoPanelStats();
+            visitGunShop(); //to update the visible buttons i.e. remove the button that the player just bought
+
+        } else {
+            console.error("insufficient funds");
+            
+            gunShopStatusMessage.innerHTML = `<br/><p>You ain't got the money for that ${weapons[gun].name}! <br/>Put that shit down and quit Wasting my time!</p>`
+        }
+    }
 }
 
 //this logic runs on page load

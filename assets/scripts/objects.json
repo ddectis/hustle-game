@@ -70,7 +70,7 @@
 
   ],
   "playerInfo": {
-    "cash": 2500,
+    "cash": 250000,
     "debt": 2500,
     "maxHealth": 100,
     "maxStash": 100,
@@ -116,6 +116,7 @@
         "average": 0
       }
     }
+
   },
   "drugs": [
     {
@@ -189,25 +190,29 @@
       "name": "pistol",
       "cost": 5000,
       "shots": 1,
-      "id": "pistol"
+      "id": "pistol",
+      "playerHas": false
     },
     {
       "name": "shotgun",
       "cost": 25000,
       "shots": 2,
-      "id": "shotgun"
+      "id": "shotgun",
+      "playerHas": false
     },
     {
       "name": "uzi",
       "cost": 100000,
       "shots": 4,
-      "id": "uzi"
+      "id": "uzi",
+      "playerHas": false
     },
     {
       "name": "plasma rifle",
       "cost": 250000,
       "shots": 10,
-      "id": "plasma"
+      "id": "plasma",
+      "playerHas": false
     }
   ]
 
