@@ -185,7 +185,7 @@ let countHeld = 0;
 let day = 0;
 let dayOfUpsidedness = 7; //this is the day when tony's goons come find you
 let healingCost = 300; //when determining the total healing cost, we take the delta between current and total healt and then multiply it by this factor
-let toalDaysInGame = 1;
+let toalDaysInGame = 30;
 let interestRate = 20; 
 let grandmasTaxesPaid = false; //The main objective is to turn this value to true by way of paying the $1M in back taxes. 
 
@@ -450,7 +450,8 @@ gameStartButton.addEventListener("click", event => {
 //continue from intro click - this is where the game actually begins
 continueFromIntroButton.addEventListener("click", event => {
     console.log("continue from intro button clicked");
-
+    const title = document.querySelector("#title")
+    title.classList.add("hide")
     
     //define the status message based on current burrough
     updateStatusMessage();
@@ -1623,25 +1624,138 @@ const gameOver = () => {
 
 
     const continueButtons = `<br/>
-        <div id="view-highscores-button" class="button padding-block-3">View HighScores</div>
-        <div id="play-again-button" class="button padding-block-3">Play Again</div>`
+        <div id="view-highscores-button" class="button padding-block-3">Continue</div>`
+        
     endOfGameMessageHolder.innerHTML = grandmaStatusString + continueButtons;
 
     const goToHighScoresButton = document.querySelector("#view-highscores-button");
     goToHighScoresButton.addEventListener("click", event => {
-        viewHighScores();
+        endOfGamePanel.classList.add("hide");
+        highScoreHandling(earnedTotal);
     })
 
-    const playAgainButton = document.querySelector("#play-again-button");
-    playAgainButton.addEventListener("click", event => {
-        location.reload(); //reload the page as a shortcut to starting a new game
-    })
+ 
 
     endOfGamePanel.classList.remove("hide")
 }
 
-const viewHighScores = () => {
-    console.log("viewing high scores")
+
+//load the high score json and also add the most recent score to the high score list and sort the high score list and print the high scores
+const highScoreHandling = (gameScore) => {
+    console.log("Loading High Scores")
+    const highScorePanel = document.querySelector("#highscore-panel");
+    highScorePanel.classList.remove("hide");
+    const highScoreMessage = document.querySelector("#high-score-message");
+
+    const savedHighscores = localStorage.getItem("highScores")
+
+    const formattedScore = gameScore.toLocaleString(undefined, { useGrouping: true });
+
+    //once this is up and running (i.e. no longer testing), wrap this in an "if taxes are paid" thing because runs that don't end with taxes paid are not eligible to be on the high score list
+    const inputName = `
+        <h2>Final Score: $${formattedScore}</h2>
+        <p>Enter YOur Name:</p>
+        <input type="text" id="player-name">
+        <br/>
+        <div class="button" id="enter-player-name">Enter</div>`
+
+    highScoreMessage.innerHTML = inputName;
+    const playerNameInput = document.querySelector("#player-name")
+    let highscores = []; 
+
+    if (savedHighscores) {
+        console.log("high scores file loaded")
+        //map the loaded high score objects to the highscores[] array
+        highscores = JSON.parse(savedHighscores)
+    } else {
+        console.log("high score file does not exist.")
+    }
+
+    const enterPlayerNameButton = document.querySelector("#enter-player-name");
+    enterPlayerNameButton.addEventListener("click", event => {
+        console.log("enter player name click");
+        
+        let scoreObject = {
+            "name": playerNameInput.value,
+            "score": gameScore
+        }
+
+        console.log(scoreObject);
+
+        //add the most recent score to the score array
+        highscores.push(scoreObject);
+
+        //sort the list from high score to low
+        highscores.sort((a,b) => b.score - a.score)
+
+        console.log(highscores)
+
+        
+
+        // Convert the player object to a JSON string
+        const savedScored = JSON.stringify(highscores);
+
+        
+
+
+        // Save the player data in localStorage
+        localStorage.setItem('highScores', savedScored);
+
+        highScoreMessage.innerHTML = ``
+
+        let target = highscores.length;
+
+        //check the amount of high scores saved
+        if (highscores.length <= 10) {
+            target = highscores.length - 1;
+        } else {
+            target = 10;
+        }
+
+        //generate HTML for the high score objects
+        for (let scoreIndex = 0; scoreIndex <= target; scoreIndex++) {
+            let printIndex = scoreIndex + 1;
+            highScoreMessage.insertAdjacentHTML("beforeEnd", `<div class="high-score-entry""><h3>#${printIndex}</h3><h3 id="entry-${printIndex}">replace-me</h3><h3>$${highscores[scoreIndex].score.toLocaleString(undefined, { useGrouping: true }) }</h3></div>`)
+            const playerName = document.querySelector(`#entry-${printIndex}`);
+            console.log(playerName)
+            let name = highscores[scoreIndex].name.slice(0, 15); //trim the name to 16 characters max
+            
+            playerName.textContent = name;
+        }
+
+        //and add a button to continue from there
+        highScoreMessage.insertAdjacentHTML("beforeend", `<br/><div class="button" id="play-again-button">Play again</div>`)
+        const playAgainButton = document.querySelector("#play-again-button");
+        playAgainButton.addEventListener("click", event => {
+            location.reload(); //reload the page as a shortcut to starting a new game
+        })
+
+    })
+}
+
+
+//probably don't need to finish writing this...well maybe actually you do once you put in the safe game feature, a page load won't reset the game, will it?
+const reinitializeGame = () => {
+
+    //reset gameplay variables
+    cash = 0;
+    debt = 0;
+    bank = 0;
+    health = 0;
+    maxHealth = 0;
+    maxStash = 0;
+    countHeld = 0;
+    day = 0;
+    grandmasTaxesPaid = false; //The main objective is to turn this value to true by way of paying the $1M in back taxes.
+
+    //clear the inventory
+    inventory.forEach(drug => {
+        drug.count = 0;
+        console.log(drug.name + " " + drug.count)
+    })
+
+
+
 }
 
 //this logic runs on page load
@@ -1655,15 +1769,12 @@ printWelcomeMessage(); //put the intro message on the screen
 //add json info - both in the drug category and then again in the inventory (you should probably generate the inventory dynamically based on a forEach of the names of the drugs in the drug list)
 
 //TODO:
-
-
-//flesh out the end of game screen
 //the bones upgrade shop and are in place. Flesh them out
 //make the value of your inventory (as opposed to the overall count) contribute more to your chance of getting mugged
 //it's possible to have tony find you and get mugged at the same time. Make that not be possible
 
 //add auto save functionality
-//use that functionality to add a high score system
+
 //add cops that chase you. More chance to get chased the more profit you make -> how is this different than a mugging?
 //add a "highest / lowest" seen thing on the market
 //add a shop so you can get some upgrades e.g. inventory size / body armor

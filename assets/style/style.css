@@ -154,7 +154,7 @@ a{
     flex-direction: column;
     align-items: center;
     width: 98%;
-    padding-top: 15%;
+    padding-top: 40%;
 
 }
 
@@ -353,6 +353,10 @@ a{
     width:100%;
 }
 
+.width-90{
+    width:90%;
+}
+
 .max-width-66{
     max-width:66%;
 }
@@ -429,11 +433,19 @@ a{
     max-width: 95%;
 }
 
+
+.high-score-entry {
+    display:flex;
+    justify-content:space-between;
+}
+
 .hide {
     display: none
 }
 
-@media screen and (min-width:450px){
+
+
+@media screen and (min-width:450px) {
     .actions-holder{
         padding-top: 14%;
     }
@@ -447,7 +459,7 @@ a{
     }
 
     .ui-parent {
-        padding-top: 1%;
+        padding-top: 18%;
     }
 
     h2{
