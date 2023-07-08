@@ -75,8 +75,8 @@
 
   ],
   "playerInfo": {
-    "cash": 25000,
-    "debt": 2500,
+    "cash": 2500,
+    "debt": 5000,
     "maxHealth": 100,
     "maxStash": 100,
     "inventory": {

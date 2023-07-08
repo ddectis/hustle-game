@@ -185,8 +185,9 @@ let countHeld = 0;
 let day = 0;
 let dayOfUpsidedness = 7; //this is the day when tony's goons come find you
 let healingCost = 300; //when determining the total healing cost, we take the delta between current and total healt and then multiply it by this factor
-let toalDaysInGame = 30;
+let toalDaysInGame = 1;
 let interestRate = 20; 
+let grandmasTaxesPaid = false; //The main objective is to turn this value to true by way of paying the $1M in back taxes. 
 
 //define travel button placeholders
 let manhattanButton = "";
@@ -293,7 +294,7 @@ So, your cousin Pauly from Jersey introduces you to his "friend" Tony.
 <br /><br />
 Tony "generously" gives you a $2,500 loan.
 <br /><br />
-Tony says he's a reasonable guy, so he's only charging ${interestRate}% interest per day.
+Tony says he's a reasonable guy, so he's only charging ${interestRate}% interest per day. Plus a very modest flat rate convenience fee surcharge. 
 <br /><br />
 With a big slap on the back, Tony says his guys will come find you in ${dayOfUpsidedness} days to see how you're doing.
 
@@ -409,28 +410,27 @@ const travelClick = destination => {
     listAvailableActivities(); //based on which burrough you are in, different activities will be available. This method handles that show / hide behavior
     randomizeDrugPrices(); 
     updateStatusMessage(); //if any exceptional drug prices were rolled, they will be printed here
-
-
-    if (debt > 0 && day > dayOfUpsidedness) {
-        console.error("Tony's loan is overdue!! Sal is looking for you")
-        lookForYou();
-    }
-
-    checkForMugging();
-    
+   
     showDealPanel(); //bring up the deal panel after a the player travels to a new burrough
 }
 
 const checkDay = () => {
     if (day <= toalDaysInGame) {
         console.log("the game is not over. It continues.")
+        if (debt > 0 && day > dayOfUpsidedness) {
+            console.error("Tony's loan is overdue!! Sal is looking for you")
+            lookForYou();
+        }
+
+        checkForMugging();
+
     } else {
         setTimeout(() => {
             activityButtonHolder.classList.add("hide");
             hideAllActionPanels();
             topPanel.classList.add("hide");
             travelPanel.classList.add("hide");
-            endOfGamePanel.classList.remove("hide")
+            gameOver();
         }, 0);
         
     }
@@ -555,14 +555,14 @@ const randomizeDrugPrices = () => {
         console.log(drug.name + " price index: " + priceRandomizer)
         if (priceRandomizer <= 1) {
             console.log(drug.name + " price crash!")
-            drugPriceNewsString += `<br/><p><b><u>${drug.name} prices have crashed!</u></b></p>`
+            drugPriceNewsString += `<p><b><u>${drug.name} prices have crashed!</u></b></p>`
             maxPrice = minPrice; //make the old minimum be the new maximum
             minPrice *= 0.33; //and then decrease the minimum
             
         }
         if (priceRandomizer >= 99) {
             console.log(drug.name + " price skyrockets!")
-            drugPriceNewsString += `<br/><p><b><u>${drug.name} prices have skyrocketed!</u></b></p>`
+            drugPriceNewsString += `<p><b><u>${drug.name} prices have skyrocketed!</u></b></p>`
             minPrice = maxPrice; //make the old max the new min 
             maxPrice *= 2;   //and define and even lower new min value
         }
@@ -1022,7 +1022,7 @@ const checkHealth = causeOfPain => {
     }
 
     if (health > 0) {
-        activityButtonHolder.classList.remove("hide");
+        //activityButtonHolder.classList.remove("hide");
         lookingForYouPanel.classList.add("hide");
     }
 }
@@ -1377,13 +1377,13 @@ const visitHospital = () => {
     } else if (health < 90 && health >= 70) {
         appraisalString = "That's nothing. Take some ibuprofen and stop wasting my time"
     } else if (health < 70 && health >= 50) {
-        appraisalString = "Kids these days. They break a few bones and they think it's the end of the world. Buck of softies. Take these painkillers and get outta my sight."
+        appraisalString = "Kids these days. They break a few bones and they think it's the end of the world. Buck of softies. Take these painkillers and get outta my sight"
     } else if (health < 50 && health >= 30) {
-        appraisalString = "It's just a flesh wound. I've seen worse. Take this super glue and apply it to the dangling appendages. And stop being so dramatic."
+        appraisalString = "It's just a flesh wound. I've seen worse. Take this super glue and apply it to the dangling appendages. And stop being so dramatic"
     } else if (health < 30) {
-        appraisalString = "Oh, damn. You're pretty fucked up. Let me take care of you."
+        appraisalString = "Oh, damn. You're pretty fucked up. Let me take care of you"
     } else if (health === 0){
-        appraisalString = "Uh, I'm not sure how to tell you this, but you're actually dead."
+        appraisalString = "Uh, I'm not sure how to tell you this, but you're actually dead"
     }
 
    
@@ -1526,23 +1526,122 @@ const visitGunShop = () => {
 
 const visitCountyOffice = () => {
     console.log("visiting county office")
-
-    //define the message that prints when the player goes to the count office
-    let countyMessage = `
-        <br /><p>As you walk up to the service window inside the stodgy government office building, a surly clerk looks you up and down and says:<br/><br/> "You want my assessment? Fire your stylist. What do you want?"</p>
+    if (!grandmasTaxesPaid) {
+        //define the message that prints when the player goes to the count office
+        let countyMessage = `
+        <br /><p>You walk up to the service window inside the stodgy government office building.</p>
         <br /><p>You explain that you're here to pay the back taxes on your Grandmother's combination orphanage and animal rescue.</p>
-        <br/><br/><p>The clerk clacks the keys on the ancient terminal in front of him to pull up Grandma's info. The clerk looks back at you with a straight face and says:<br/><br/> "That'll be one million dollars. We can only accept payment in full. Will that be check or credit?"</p>
+        <br/><p>The clerk clacks the keys on the ancient terminal in front of him to pull up Grandma's info. He looks back at you with a straight face and says:<br/><br/> "That'll be one million dollars. We can only accept payment in full. Will that be check or credit?"</p>
         `
+        countyInfoHolder.innerHTML = countyMessage;
 
-    //check to see if the player has sufficient moneys to pay off the taxes
-    if (cash > 1000000) {
-        countyMessage += `<div id="pay-taxes" class="button">Uhhh...cash </div>`
-        const payTaxesButton = document.querySelector("#pay-taxes");
-        payTaxesButton.addEventListener("click", event => {
+        //check to see if the player has sufficient moneys to pay off the taxes
+        if (cash >= 1000000) {
+            console.log("player has enough moneys")
+            let payButton = `<div id="pay-taxes" class="button padding-block-3">"Well..." (pay $1,000,000) </div>`
+            countyInfoHolder.insertAdjacentHTML("beforeend", payButton)
 
-        })
+            const payTaxesButton = document.querySelector("#pay-taxes");
+            payTaxesButton.addEventListener("click", event => {
+                console.log("pay tax button clicked");
+                cash -= 1000000;
+                updateInfoPanelStats();
+                grandmasTaxesPaid = true;
+                countyInfoHolder.innerHTML = `
+                <br/><br/><p>"Well," You say, as you begin passing piles of bills through the window, "it's gonna be cash today."</p>
+                <br/><h2>CONGRATULATIONS!! YOU HAVE SAVED GRANDMA'S COMBINATION OPHANAGE AND ANIMAL RESCUE AND MULTI-GENERATIONAL HOME! WAY TO GO!</h2>
+                <br/><div id="continue-from-tax-button" class="button padding-block-3">Cool, man. Right on. I did it all for Grandma and for the kitties and puppies.</div>
+                <br/><p class="small-text">(continue to max your cash until 30 days is up!)</p>
+                `
+                const continueFromTaxButton = document.querySelector("#continue-from-tax-button")
+                continueFromTaxButton.addEventListener("click", event => {
+                    countyPanel.classList.add("hide");
+
+                })
+            })
+        } else {
+            console.log("insufficient funds");
+            countyInfoHolder.insertAdjacentHTML("beforeEnd",`<br/><p>"Oh," you say, patting your pockets, "I forgot my wallet! I'll be right back"`)
+        }
+    } else {
+        let countyMessage = `
+            <br/><p>Hello, again. Did you return to explain the origin of the million dollars in cash?</p>
+            `
+        countyInfoHolder.innerHTML = countyMessage;
     }
-    countyInfoHolder.innerHTML = countyMessage;
+    
+   
+}
+
+const gameOver = () => {
+    const endOfGameMessageHolder = document.querySelector("#end-of-game-status-message")
+
+    let earnedTotal = cash + bank;
+    let earnedTotalFormated = earnedTotal.toLocaleString(undefined, { useGrouping: true });
+
+    let grandmaStatusString = ``;
+    let rewardString = ``;
+    //if the player completed the primary objective of the game, they get the good ending
+    if (grandmasTaxesPaid) {
+        grandmaStatusString = `<br/><p>You saved Grandma's House! And all of those orphans! And countless small helpless furry critters!</p></br><p>Each of those innocent critters will forever look up to you for many reasons, chief among them that they don't ask questions.</p><br/><p>Way to go!</p><br/><p>And on top of this heroic feat, you also banked: $${earnedTotalFormated} for yourself.`
+
+        //define levels to determine what kind of special text is printed for the "what you do with your money" thing
+        let rewardThreshold0 = 50000;
+        let rewardThreshold1 = 150000;
+        let rewardThreshold2 = 500000;
+        let rewardThreshold3 = 1000000;
+        let rewardThreshold4 = 5000000;
+        let rewardThreshold5 = 10000000;
+
+        rewardString = `<br/><br/><p>So, now what?</p>`
+
+        if (earnedTotal < rewardThreshold0) {
+            rewardString += `<br/><p>You didn't end up with much, but the important thing is you saved the house, you saved the puppies, the kitties and the orphans. Good work.</p>`;
+        } else if (earnedTotal >= rewardThreshold0 && earnedTotal < rewardThreshold1) {
+            rewardString += `<br /><p>You decide to take a luxurious world tour with the gains from your efforts.</p><br/><p>Bon voyage!</p>`;
+        } else if (earnedTotal >= rewardThreshold1 && earnedTotal < rewardThreshold2) {
+            rewardString += `<br/><p>You set off to look for a bit of woodsy land with a stream running through it to buy.</p><p>You look forward to taking it easy in the woods next to that stream for a good while</p>`;
+        } else if (earnedTotal >= rewardThreshold2 && earnedTotal < rewardThreshold3) {
+            rewardString += `<br/><p>You're just gonna chill for a while. With this money, you won't have to work for a long time.</p><br/><p>What have you always wanted to learn how to do? You're in school for that now. Go learn!</p>`;
+        } else if (earnedTotal >= rewardThreshold3 && earnedTotal < rewardThreshold4) {
+            rewardString += `<br/><p>You've been thinking about where you want to live. With this money, you can buy a nice place anywhere in the world and just chill. Where will you go?</p>`;
+        } else if (earnedTotal >= rewardThreshold4 && earnedTotal < rewardThreshold5) {
+            rewardString += `<br/><p>You plan to get a nice place in a nice part of town. You're going to go legit and start a business. You upgrade Grandma's place so you can take in lots more puppies and kitties. And you make donations to help reduce the incidence of orphans.</p>`;
+        } else if (earnedTotal >= rewardThreshold5 ) {
+            rewardString += `<br/><p>You upgrade Grandma's place so you can take in lots more puppies and kitties.<br/><br/>You make donations to help reduce the incidence of orphans. <br/><br/>You've been thinking about where you want to live. With this money, you will never have to work again. You can buy a nice place anywhere in the world and just chill. <br/><br/>Where will you go?</p>`;
+        }
+
+        //append the reward string you just selected onto the string you generated above. This will end up in the final status message below.
+        grandmaStatusString += rewardString;
+
+        //TODO: Save high score!
+    } else {
+        //if the player did not complete the primary objective, they get a sassy ending and no reward text and no high score saving
+        grandmaStatusString = `<br/><p>Dude, you didn't pay the back taxes on Grandma's place. Now they're tearing it down and all those orphans and all those puppies and kitties are gonna be out on the street! You monster!</p><br/> <p>The $${earnedTotalFormated} that you banked is a hollow victory which neither man nor beast will celebrate.</p>`
+    }
+
+
+
+    const continueButtons = `<br/>
+        <div id="view-highscores-button" class="button padding-block-3">View HighScores</div>
+        <div id="play-again-button" class="button padding-block-3">Play Again</div>`
+    endOfGameMessageHolder.innerHTML = grandmaStatusString + continueButtons;
+
+    const goToHighScoresButton = document.querySelector("#view-highscores-button");
+    goToHighScoresButton.addEventListener("click", event => {
+        viewHighScores();
+    })
+
+    const playAgainButton = document.querySelector("#play-again-button");
+    playAgainButton.addEventListener("click", event => {
+        location.reload(); //reload the page as a shortcut to starting a new game
+    })
+
+    endOfGamePanel.classList.remove("hide")
+}
+
+const viewHighScores = () => {
+    console.log("viewing high scores")
 }
 
 //this logic runs on page load
@@ -1563,9 +1662,8 @@ printWelcomeMessage(); //put the intro message on the screen
 //make the value of your inventory (as opposed to the overall count) contribute more to your chance of getting mugged
 //it's possible to have tony find you and get mugged at the same time. Make that not be possible
 
-//Add the county office where you can pay off the loan on grandma's house
 //add auto save functionality
 //use that functionality to add a high score system
-//add cops that chase you. More chance to get chased the more profit you make -> how is this different than a mugging? 
+//add cops that chase you. More chance to get chased the more profit you make -> how is this different than a mugging?
 //add a "highest / lowest" seen thing on the market
 //add a shop so you can get some upgrades e.g. inventory size / body armor
