@@ -348,6 +348,7 @@ const loadObjectsJSON = async() => {
         console.error("Error loading JSON file:", error);
     }
 
+    loadGame(); //check to see if the player has a game in progress
     updateInfoPanelStats(); //and print their values
     createTravelButtons();
     randomizeDrugPrices();
@@ -466,6 +467,8 @@ continueFromIntroButton.addEventListener("click", event => {
     
 })
 
+
+let firstUpdatePointPassed = false
 //call this method any time you want to update the printed UI info values
 const updateInfoPanelStats = () => {
     cashUI.textContent = `$${cash.toLocaleString(undefined, { useGrouping: true })}`; //toLocaleString etc is a method to print a number e.g. $35,235.35
@@ -476,6 +479,11 @@ const updateInfoPanelStats = () => {
     stashUI.textContent = `${countHeld} / ${maxStash}`;
     console.log("UI values updated");
 
+    //generally when we update the info panel, we also want to save the game. However, we do not want to save the game when we first set the UI. This logic handles that
+    if (firstUpdatePointPassed) {
+        saveGame(); //also save the game every time we update the stats. This seems like a good place to place this call as we're updating the stats every time the state changes
+    }
+    firstUpdatePointPassed = true;
 }
 
 const updateStatusMessage = () => {
@@ -729,6 +737,8 @@ const printDrugPrices = () => {
     
     drugInfoArray.forEach(entry => {
         let name = drugs[index].name.toLowerCase();
+        //console.log("Here's the inventory:")
+        //console.log(inventory)
         let average = inventory[name].average
         average = average.toFixed(2);
         //console.log("here we go now with " + name);
@@ -1035,6 +1045,7 @@ const visitBank = () => {
 
 }
 
+//handles banking deposits
 const deposit = percent => {
     console.log("Depositing: " + percent);
     let depositAmount = cash * percent / 100;
@@ -1044,6 +1055,7 @@ const deposit = percent => {
     visitBank();
 }
 
+//handles banking withdrawals
 const withdraw = percent => {
     console.log("Withdrawing: " + percent);
     let withdrawAmount = bank * percent / 100;
@@ -1053,7 +1065,7 @@ const withdraw = percent => {
     visitBank();
 }
 
-//you should also bake the police chase trigger into this method
+//this method is called every time the player moves around
 const checkForMugging = () => {
 
     let cashFactor = cash / 10000; //every $10,000 in the player's inventory increases the chances of a mugging by 1%
@@ -1080,13 +1092,13 @@ const checkForMugging = () => {
     }
 }
 
-//logic to allow the player to fight back or escape
-
+//the player can fight back but only if they have a weapon
 const checkIfPlayerHasWeapon = () => {
     return weapons.some((weapon) => weapon.playerHas === true);
     
 }
 
+//the player decides if they want to fight back or run
 const fightOrFlight = () => {
     //placeholder pass through function for now
     //playerMugged(); //remove me
@@ -1184,6 +1196,7 @@ const fightOrFlight = () => {
     
 }
 
+//if the player tries to fight back, this method is used
 const fightBack = (shots, bestWeaponHeld) => {
     console.log("fighting back. You're gonna take " + shots + " shots")
     let shotOrShots = "";
@@ -1245,6 +1258,7 @@ const fightBack = (shots, bestWeaponHeld) => {
     
 }
 
+//when the player runs away, this method is used
 const runAway = () => {
     const muggingButtonsHolder = document.querySelector("#mugging-buttons")
     muggingInfoHolder.innerHTML = `<h4>RUN AWAY!</h4>`
@@ -1289,6 +1303,7 @@ const runAway = () => {
     
 }
 
+//the mugger will shoot at the player, this method is used to determine if the player is hit and how much damage happened
 const getShotAt = () => {
     //if they didn't catch the player, mugger takes a shot at the player. Chance to lose HP
     console.log("getting shot at");
@@ -1340,7 +1355,7 @@ const playerMugged = () => {
 
     let damage = Random.int(5, 50);
     health -= damage;
-
+    checkHealth();
     //print info about the outcome
     muggingInfoHolder.innerHTML += `
         
@@ -1440,6 +1455,7 @@ const visitHospital = () => {
         
 }
 
+//bring up the gun shop info and establish functionality to enable buying a weapon + adding it to player's inventory
 const visitGunShop = () => {
     console.log("visiting gun shop");
     gunShopInfoHoldder.innerHTML = ``
@@ -1502,9 +1518,6 @@ const visitGunShop = () => {
     } catch {
         console.log("Buy Plasma Rifle doesn't exist because the player has already bought it")
     }
-    
-    
-    
 
     const buyGun = (gun) => {
         
@@ -1525,6 +1538,7 @@ const visitGunShop = () => {
     }
 }
 
+//bring up the tax info for Grandma's place. Player can pay the $1M tax bill here. Completing the tax payment is the main objective of the game
 const visitCountyOffice = () => {
     console.log("visiting county office")
     if (!grandmasTaxesPaid) {
@@ -1546,7 +1560,7 @@ const visitCountyOffice = () => {
             payTaxesButton.addEventListener("click", event => {
                 console.log("pay tax button clicked");
                 cash -= 1000000;
-                updateInfoPanelStats();
+                
                 grandmasTaxesPaid = true;
                 countyInfoHolder.innerHTML = `
                 <br/><br/><p>"Well," You say, as you begin passing piles of bills through the window, "it's gonna be cash today."</p>
@@ -1554,6 +1568,9 @@ const visitCountyOffice = () => {
                 <br/><div id="continue-from-tax-button" class="button padding-block-3">Cool, man. Right on. I did it all for Grandma and for the kitties and puppies.</div>
                 <br/><p class="small-text">(continue to max your cash until 30 days is up!)</p>
                 `
+
+                updateInfoPanelStats();
+
                 const continueFromTaxButton = document.querySelector("#continue-from-tax-button")
                 continueFromTaxButton.addEventListener("click", event => {
                     countyPanel.classList.add("hide");
@@ -1574,6 +1591,7 @@ const visitCountyOffice = () => {
    
 }
 
+//when the game is over i.e. time has expired, not because of player death. The outcome of the game is printed in here and then it prints a button that will let the player continue onto the high score function
 const gameOver = () => {
     const endOfGameMessageHolder = document.querySelector("#end-of-game-status-message")
 
@@ -1615,13 +1633,11 @@ const gameOver = () => {
         //append the reward string you just selected onto the string you generated above. This will end up in the final status message below.
         grandmaStatusString += rewardString;
 
-        //TODO: Save high score!
     } else {
         //if the player did not complete the primary objective, they get a sassy ending and no reward text and no high score saving
         grandmaStatusString = `<br/><p>Dude, you didn't pay the back taxes on Grandma's place. Now they're tearing it down and all those orphans and all those puppies and kitties are gonna be out on the street! You monster!</p><br/> <p>The $${earnedTotalFormated} that you banked is a hollow victory which neither man nor beast will celebrate.</p>`
+        earnedTotal = 0; //setting this to 0 makes the score passed into to the high score handler will be 0
     }
-
-
 
     const continueButtons = `<br/>
         <div id="view-highscores-button" class="button padding-block-3">Continue</div>`
@@ -1633,8 +1649,6 @@ const gameOver = () => {
         endOfGamePanel.classList.add("hide");
         highScoreHandling(earnedTotal);
     })
-
- 
 
     endOfGamePanel.classList.remove("hide")
 }
@@ -1661,7 +1675,7 @@ const highScoreHandling = (gameScore) => {
 
     highScoreMessage.innerHTML = inputName;
     const playerNameInput = document.querySelector("#player-name")
-    let highscores = []; 
+    let highscores = [];
 
     if (savedHighscores) {
         console.log("high scores file loaded")
@@ -1674,7 +1688,7 @@ const highScoreHandling = (gameScore) => {
     const enterPlayerNameButton = document.querySelector("#enter-player-name");
     enterPlayerNameButton.addEventListener("click", event => {
         console.log("enter player name click");
-        
+
         let scoreObject = {
             "name": playerNameInput.value,
             "score": gameScore
@@ -1686,17 +1700,11 @@ const highScoreHandling = (gameScore) => {
         highscores.push(scoreObject);
 
         //sort the list from high score to low
-        highscores.sort((a,b) => b.score - a.score)
-
+        highscores.sort((a, b) => b.score - a.score)
         console.log(highscores)
-
-        
 
         // Convert the player object to a JSON string
         const savedScored = JSON.stringify(highscores);
-
-        
-
 
         // Save the player data in localStorage
         localStorage.setItem('highScores', savedScored);
@@ -1709,17 +1717,17 @@ const highScoreHandling = (gameScore) => {
         if (highscores.length <= 10) {
             target = highscores.length - 1;
         } else {
-            target = 10;
+            target = 19;
         }
 
         //generate HTML for the high score objects
         for (let scoreIndex = 0; scoreIndex <= target; scoreIndex++) {
             let printIndex = scoreIndex + 1;
-            highScoreMessage.insertAdjacentHTML("beforeEnd", `<div class="high-score-entry""><h3>#${printIndex}</h3><h3 id="entry-${printIndex}">replace-me</h3><h3>$${highscores[scoreIndex].score.toLocaleString(undefined, { useGrouping: true }) }</h3></div>`)
+            highScoreMessage.insertAdjacentHTML("beforeEnd", `<div class="high-score-entry""><h3>#${printIndex}</h3><h3 id="entry-${printIndex}">replace-me</h3><h3>$${highscores[scoreIndex].score.toLocaleString(undefined, { useGrouping: true })}</h3></div>`)
             const playerName = document.querySelector(`#entry-${printIndex}`);
             console.log(playerName)
             let name = highscores[scoreIndex].name.slice(0, 15); //trim the name to 16 characters max
-            
+
             playerName.textContent = name;
         }
 
@@ -1733,6 +1741,83 @@ const highScoreHandling = (gameScore) => {
     })
 }
 
+const saveGame = () => {
+    //create an object that contains every value that you wish you save
+    console.log("inventory just ahead of save:")
+    console.log(inventory)
+    let saveObject = {
+        "day": day,
+        "cash": cash,
+        "bank": bank,
+        "debt": debt,
+        "health": health,
+        "maxHealth": maxHealth,
+        "stash": countHeld,
+        "maxStash": maxStash,
+        "inventory": inventory,
+        "weapons": weapons,
+        "taxPaid": grandmasTaxesPaid
+    }
+    
+    console.log(saveObject)
+
+    //convert the save object into a JSON string
+    const saveJSON = JSON.stringify(saveObject);
+
+    //and save that JSON in localStorate
+    localStorage.setItem("savedGame", saveJSON)
+
+
+}
+
+const loadGame = () => {
+    console.log("checking for saved game");
+
+    //load the savedGame JSON string from locaStroage
+    const loadedGame = localStorage.getItem("savedGame");
+
+    //parse the JSON string into an object
+    const loadedObject = JSON.parse(loadedGame);
+    console.log("Here's the loaded objects: ")
+    console.log(loadedObject)
+    let gameLoaded = false;
+    try {
+
+        //as I wrote this load method, I realized that if I cleaned up my data structures, it would be a lot easier to write and extend this method.
+        //If all of these gameplay variables were put into a JSON array, then I could load and save the game with one simple "=" operation instead of going line by line
+        //not sure I'll put that refactor work into this code but it's a lesson I'll definitely carry forward to future projects
+        day = loadedObject.day;
+        cash = loadedObject.cash;
+        bank = loadedObject.bank;
+        debt = loadedObject.debt;
+        health = loadedObject.health;
+        maxHealth = loadedObject.maxHealth;
+        countHeld = loadedObject.stash;
+        maxStash = loadedObject.maxStash;
+        inventory = loadedObject.inventory;
+        weapons = loadedObject.weapons;
+        grandmasTaxesPaid = loadedObject.taxPaid;
+
+        console.log("found a saved game to load")
+        console.log(loadedObject)
+        console.log(inventory)
+        gameLoaded = true;
+    } catch (error) {
+        console.log("While trying tl oad the save game, the following error occurred: " + error);
+    }
+
+    //put an "erase saved game" button on screen if the player has a saved game
+    if (gameLoaded) {
+        const eraseSavedGameButton = document.querySelector("#erase-saved-game")
+        eraseSavedGameButton.classList.remove("hide");
+        eraseSavedGameButton.addEventListener("click", event => {
+            console.log("saved game erased")
+            localStorage.removeItem("savedGame")
+            location.reload(); //reload the page as a shortcut to starting a new game
+        })
+    }
+
+}
 
 //probably don't need to finish writing this...well maybe actually you do once you put in the safe game feature, a page load won't reset the game, will it?
 const reinitializeGame = () => {
@@ -1758,9 +1843,12 @@ const reinitializeGame = () => {
 
 }
 
-//this logic runs on page load
+//this logic runs on page load. This is the hook that gets you into all of the other functions above.
+
 loadObjectsJSON(); //and load the JSON objects for things like locations
+
 printWelcomeMessage(); //put the intro message on the screen
+
 
 
 //to add a new drug:
@@ -1769,6 +1857,10 @@ printWelcomeMessage(); //put the intro message on the screen
 //add json info - both in the drug category and then again in the inventory (you should probably generate the inventory dynamically based on a forEach of the names of the drugs in the drug list)
 
 //TODO:
+//wait to add the padding on the ui-parent until you click to start the game (this can be your first try at applying a css attribute via JS)
+//add a settings pane with
+    //theme options
+    //option to clear saved games
 //the bones upgrade shop and are in place. Flesh them out
 //make the value of your inventory (as opposed to the overall count) contribute more to your chance of getting mugged
 //it's possible to have tony find you and get mugged at the same time. Make that not be possible
