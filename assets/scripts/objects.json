@@ -219,6 +219,39 @@
       "id": "plasma",
       "playerHas": false
     }
+  ],
+  "themes": [
+    {
+      "name": "standard",
+      "backgroundColor": "#252525",
+      "textColor": "#6cda82",
+      "buttonDropShadowColor": "#498154",
+      "buttonTextColor": "#252525",
+      "storeColor": "#6cda8282"
+    },
+    {
+      "name": "light",
+      "backgroundColor": "#cbc8c8",
+      "textColor": "#252525",
+      "buttonTextColor": "#cbc8c8",
+      "buttonDropShadowColor": "#aaaaaa",
+      "storeColor": "#25252590"
+    },
+    {
+      "name": "orange",
+      "backgroundColor": "#252525",
+      "textColor": "#dad06c",
+      "buttonTextColor": "#252525",
+      "buttonDropShadowColor": "#79743d",
+      "storeColor": "#dad06c95"
+    },
+    {
+      "name": "blue",
+      "backgroundColor": "#404a80",
+      "textColor": "#252525",
+      "buttonTextColor": "#cbc8c8",
+      "storeColor": "#25252590"
+    }
   ]
 
 }

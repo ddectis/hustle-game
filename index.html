@@ -3,7 +3,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="./assets/style/style.css?22" />
+    <link rel="stylesheet" href="./assets/style/style.css?23" />
      <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Time to Hustle</title>
     <title></title>
@@ -12,13 +12,17 @@
 
     <div class="title" id="title">
         <h1>Hustle!</h1>
-
+        
     </div>
 
     <div class="ui-parent">
         <div class="ui-and-status" id="top-panel">
             <div class="ui-holder hide" id="info-panel">
-                <h2>HustleTime!</h2>
+                <div>
+                    <h2>HustleTime!</h2>
+                    <div class="button small-text" id="settings-button">Options</div>
+                </div>
+                
                 <div class="stats-holder">
 
                     <div class="stats-headers">
@@ -252,11 +256,27 @@
 
 
         </div>
-        <br/><br/><div class="button hide" id="erase-saved-game">Erase Saved Game</div>
+        
+        <div class="actions-holder" id="settings-panel">
+            <div class="actions">
+                <h2>Game Options</h2>
+                <br /><div class="button hide" id="intro-erase-saved-game">Erase Saved Game & Start Again</div>
+                <br /><h3>Visual Themes</h3>
+                <div class="button-holder">
+                    <div class="button-stardard-theme" id="standard-theme-button">Standard</div>
+                    <div class="button-light-theme" id="light-theme-button">Light Theme</div>
+                    <div class="button-orange-theme" id="orange-theme-button">Orange</div>
+                    <div class="button-blue-theme" id="blue-theme-button">Blue</div>
+                </div>
+                
+            </div>
+            
+        </div>
+        
 
     </div>
     <div class="footer">HustleTime is a <a href="https://dectronica.com/" target="_blank">Dectronica</a> Funtime Learning Project</div>
 
-    <script type="module" src="./assets/scripts/index.js?22"></script>
+    <script type="module" src="./assets/scripts/index.js?23"></script>
 </body>
 </html>

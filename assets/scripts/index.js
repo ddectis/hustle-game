@@ -142,6 +142,7 @@ countyActivytButton.addEventListener("click", event => {
     countyPanel.classList.remove("hide");
 })
 
+
 const showDealPanel = () => {
     hideAllActionPanels();
     dealPanel.classList.remove("hide");
@@ -153,8 +154,6 @@ const hideAllActionPanels = () => {
     })
 }
 
-
-
 //references to player stats on the UI info panel
 const cashUI = document.querySelector("#cash")
 const debtUI = document.querySelector("#debt")
@@ -162,12 +161,9 @@ const bankUI = document.querySelector("#bank");
 const healthUI = document.querySelector("#health")
 const stashUI = document.querySelector("#stash")
 
-
-
 let currentLocation = 0; //this is an array index value that connects to "locations" which is an array of location objects
 
 let statusMessage = "";
-
 
 let burroughs = []; //this is an object that will contain additional info about each location e.g. services,  etc
 let drugs = {};
@@ -274,6 +270,26 @@ deposit100.addEventListener("click", event => {
 let drugListInitialized = false;
 let drugPriceNewsString = ``; //this string will be used to store drug price announcements in the status bar e.g. price crash or skyrocket
 
+//create a reference to the settings button and then attach 
+const settingsPanel = document.querySelector("#settings-panel")
+const settingsButton = document.querySelector("#settings-button")
+settingsButton.addEventListener("click", event => {
+    actionPanel.classList.toggle("hide");
+    settingsPanel.classList.toggle("hide");
+})
+
+//create a place to store the theme colors loaded in objects.json
+let themeColors = [];
+
+//create references to the visual theme buttons. Listeners will be added in the loadJSON method, because you want the listeners to have the correct values for the theme colors from the json
+const standardThemeButton = document.querySelector("#standard-theme-button")
+const lightThemeButton = document.querySelector("#light-theme-button");
+const orangeThemeButton = document.querySelector("#orange-theme-button");
+const blueThemeButton = document.querySelector("#blue-theme-button");
+
+
+
+
 
 const welcomeMessage = `<p>Oh, man. <br/><br/>The county tax assessor 
 says Grandma is gonna lose the house. 
@@ -303,6 +319,7 @@ With a big slap on the back, Tony says his guys will come find you in ${dayOfUps
 
 
 const printWelcomeMessage = () => {
+    console.log("printing welcome message")
     statusMessageHolder.innerHTML = welcomeMessage;
 }
 
@@ -317,6 +334,9 @@ const loadObjectsJSON = async() => {
         drugs = objects.drugs;
         inventory = objects.playerInfo.inventory;
         weapons = objects.weapons;
+        themeColors = objects.themes;
+
+        console.log(themeColors);
         console.log(objects.weapons[0]);
 
         console.log(inventory);
@@ -342,11 +362,31 @@ const loadObjectsJSON = async() => {
         health = objects.playerInfo.maxHealth;
         maxHealth = objects.playerInfo.maxHealth;
         maxStash = objects.playerInfo.maxStash;
-        
+
+
              
     } catch (error) {
         console.error("Error loading JSON file:", error);
     }
+
+
+    //and then add listeners to make the theme buttons do something
+    standardThemeButton.addEventListener("click", event => {
+        console.log("standard theme button clicked");
+        changeVisualTheme(0)
+    })
+    lightThemeButton.addEventListener("click", event => {
+        console.log("light theme button clicked");
+        changeVisualTheme(1)
+    })
+    orangeThemeButton.addEventListener("click", event => {
+        console.log("orange theme button clicked");
+        changeVisualTheme(2)
+    })
+    blueThemeButton.addEventListener("click", event => {
+        console.log("blue theme button clicked");
+        changeVisualTheme(3)
+    })
 
     loadGame(); //check to see if the player has a game in progress
     updateInfoPanelStats(); //and print their values
@@ -355,6 +395,62 @@ const loadObjectsJSON = async() => {
     listAvailableActivities();
     
 
+}
+
+const changeVisualTheme = (themeNumber) => {
+    console.log("loading theme: " + themeNumber)
+    console.log(themeColors[themeNumber].backgroundColor)
+
+    let backgroundColor = themeColors[themeNumber].backgroundColor;
+    let textColor = themeColors[themeNumber].textColor;
+    let buttonTextColor = themeColors[themeNumber].buttonTextColor;
+    let buttonShadowColor = themeColors[themeNumber].buttonDropShadowColor;
+    let drugNameBackgroundColor = themeColors[themeNumber].storeColor;
+
+    //add references to all of the element you'll need to change. Group them into arrays so you can forEach over them to change the CSS
+    const bodyElement = document.querySelector("body")
+    const buttonElements = document.querySelectorAll(".button")
+    console.log(buttonElements)
+
+    //the body and the text on all the buttons are the same color
+    //the body text and the button background are the same color
+    bodyElement.style.color = textColor;
+    bodyElement.style.backgroundColor = backgroundColor;
+    buttonElements.forEach(button => { //buttonElements is a node list, so you have to iterate over it
+        button.style.color = buttonTextColor;
+        button.style.backgroundColor = textColor;
+        let boxShadowString = `${buttonShadowColor} 3px 5px 0px`
+        console.log(boxShadowString);
+        button.style.boxShadow = boxShadowString;
+    })
+
+    const uiHolders = document.querySelectorAll(".ui-holder")
+    console.log(uiHolders)
+    uiHolders.forEach(holder => {
+        console.log(holder)
+        holder.style.borderColor = textColor;
+    })
+
+    const actionHolders = document.querySelectorAll(".actions")
+    actionHolders.forEach(holder => {
+        holder.style.borderColor = textColor;
+    })
+
+    const drugDealElements = document.querySelectorAll(".drug-deal")
+    drugDealElements.forEach(deal => {
+        deal.style.outlineColor = textColor;
+    })
+
+    const drugDealNameBackgroundElements = document.querySelectorAll(".drug-name")
+    drugDealNameBackgroundElements.forEach(drug => {
+        drug.style.backgroundColor = drugNameBackgroundColor;
+    })
+
+    topPanel.style.borderColor = textColor;
+    topPanel.style.backgroundColor = backgroundColor;
+    infoPanel.style.borderColor = textColor;
+
+    console.log("Background Color: " + backgroundColor)
 }
 
 //create references to the travel buttons and add listeners. Listeners should call a univeral travel function that takes a value in to point the travel destination
@@ -451,9 +547,14 @@ gameStartButton.addEventListener("click", event => {
 //continue from intro click - this is where the game actually begins
 continueFromIntroButton.addEventListener("click", event => {
     console.log("continue from intro button clicked");
+    initializeGame();
+    
+})
+
+const initializeGame = () => {
     const title = document.querySelector("#title")
     title.classList.add("hide")
-    
+
     //define the status message based on current burrough
     updateStatusMessage();
 
@@ -464,8 +565,7 @@ continueFromIntroButton.addEventListener("click", event => {
     dealPanel.classList.remove("hide");
     topPanel.classList.add("sticky-div")
     continueFromIntroButton.classList.add("hide")
-    
-})
+}
 
 
 let firstUpdatePointPassed = false
@@ -1806,9 +1906,24 @@ const loadGame = () => {
         console.log("While trying tl oad the save game, the following error occurred: " + error);
     }
 
-    //put an "erase saved game" button on screen if the player has a saved game
+    //loadGame() is run on page laod, if the game is loaded successfully, the below logic runs. The purpose here is to intercept the usual game start routine to let the player know that they have a saved game they can continue if they wish
     if (gameLoaded) {
-        const eraseSavedGameButton = document.querySelector("#erase-saved-game")
+        gameStartButton.classList.add("hide");
+
+        statusMessageHolder.innerHTML = `
+            <h2>You have a saved game in progress.</h2>
+            <br/><p>You are on day ${day} and you have $${cash.toLocaleString(undefined, { useGrouping: true })}</p>
+            <br/>
+            <div class="button" id="continue-game-button">Continue Saved Game</div>`
+
+        const continueGameButton = document.querySelector("#continue-game-button")
+        continueGameButton.addEventListener("click", event => {
+            initializeGame();
+            settingsPanel.classList.add("hide");
+            
+        })
+
+        const eraseSavedGameButton = document.querySelector("#intro-erase-saved-game")
         eraseSavedGameButton.classList.remove("hide");
         eraseSavedGameButton.addEventListener("click", event => {
             console.log("saved game erased")
@@ -1857,6 +1972,7 @@ printWelcomeMessage(); //put the intro message on the screen
 //add json info - both in the drug category and then again in the inventory (you should probably generate the inventory dynamically based on a forEach of the names of the drugs in the drug list)
 
 //TODO:
+//make the very first theme options work. Use Orange. You're going to keep the background color the same but apply the orange color to the text and button background color. Apply the button drop shadow to the drop shadow
 //wait to add the padding on the ui-parent until you click to start the game (this can be your first try at applying a css attribute via JS)
 //add a settings pane with
     //theme options
@@ -1864,8 +1980,6 @@ printWelcomeMessage(); //put the intro message on the screen
 //the bones upgrade shop and are in place. Flesh them out
 //make the value of your inventory (as opposed to the overall count) contribute more to your chance of getting mugged
 //it's possible to have tony find you and get mugged at the same time. Make that not be possible
-
-//add auto save functionality
 
 //add cops that chase you. More chance to get chased the more profit you make -> how is this different than a mugging?
 //add a "highest / lowest" seen thing on the market
