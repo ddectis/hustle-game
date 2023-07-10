@@ -46,6 +46,8 @@ const upgradeShopPanel = document.querySelector("#upgrade-shop-panel");
 const gunShopPanel = document.querySelector("#gun-shop-panel");
 const countyPanel = document.querySelector("#county-panel");
 
+const marketStatusPopup = document.querySelector("#market-status-popup")
+
 
 const topPanel = document.querySelector("#top-panel");
 
@@ -58,6 +60,7 @@ const hospitalInfoHolder = document.querySelector("#hospital-info")
 const gunShopInfoHoldder = document.querySelector("#gun-shop-info")
 const fightBackInfoHolder = document.querySelector("#fight-back-info");
 const countyInfoHolder = document.querySelector("#county-info");
+const shopInfoHolder = document.querySelector("#upgrade-shop-info")
 
 
 //this array refers to each of the panels. This is used to show / hide each panel on button clicks
@@ -126,6 +129,7 @@ upgradeShopActivityButton.addEventListener("click", event => {
     hideAllActionPanels();
     lookingForYouPanel.classList.add("hide");
     upgradeShopPanel.classList.remove("hide");
+    visitShop();
 });
 gunShopActivityButton.addEventListener("click", event => {
     console.log("gun shop button clicked")
@@ -169,6 +173,7 @@ let burroughs = []; //this is an object that will contain additional info about 
 let drugs = {};
 let inventory = {};
 let weapons = {};
+let upgrades = {};
 
 //define player stats placeholders
 let cash = 0;
@@ -301,7 +306,7 @@ const lightThemeButton = document.querySelector("#light-theme-button");
 const orangeThemeButton = document.querySelector("#orange-theme-button");
 const blueThemeButton = document.querySelector("#blue-theme-button");
 
-
+let playerStats = []; //player stats will be recorded here every turn. This data will be used to make graphs
 
 
 
@@ -446,6 +451,9 @@ const changeVisualTheme = (themeNumber) => {
         holder.style.borderColor = textColor;
     })
 
+    marketStatusPopup.style.borderColor = textColor;
+    marketStatusPopup.style.backgroundColor = backgroundColor;
+
     const actionHolders = document.querySelectorAll(".actions")
     actionHolders.forEach(holder => {
         holder.style.borderColor = textColor;
@@ -509,6 +517,9 @@ const createTravelButtons = () => {
 const travelClick = destination => {
     console.log("Traveling to : " + burroughs[destination].name);
     currentLocation = destination;
+
+    recordPlayerStats();
+
     day++;
     let interest = debt * interestRate / 100
     let trimmedInterest = parseFloat(interest.toFixed(2));
@@ -524,6 +535,20 @@ const travelClick = destination => {
     updateStatusMessage(); //if any exceptional drug prices were rolled, they will be printed here
    
     showDealPanel(); //bring up the deal panel after a the player travels to a new burrough
+}
+
+const recordPlayerStats = () => {
+    console.log("recording player stats")
+    let totalEarned = cash + bank;
+    //record the day's information
+    let stats = {
+        "totalEarned": totalEarned,
+        "stash": countHeld
+    }
+    playerStats.push(stats);
+    console.log(playerStats)
+    //add it to the player stats array
+
 }
 
 const checkDay = () => {
@@ -597,6 +622,9 @@ const updateInfoPanelStats = () => {
     healthUI.textContent = `${health} / ${maxHealth}`;
     stashUI.textContent = `${countHeld} / ${maxStash}`;
     console.log("UI values updated");
+
+    updateStatsChart();
+
 
     //generally when we update the info panel, we also want to save the game. However, we do not want to save the game when we first set the UI. This logic handles that
     if (firstUpdatePointPassed) {
@@ -873,6 +901,10 @@ const printDrugPrices = () => {
 
 }
 
+//create a variable to keep track of how many units are bought / sold when the player has the "buy / sell max" toggle enabled
+let countMoved = 0
+let totalCost = 0;
+
 //take in an index value to match to the drugs array and then handle the logic to buy one unit of a drug
 const buyDrug = drugIndex => {
 
@@ -880,11 +912,17 @@ const buyDrug = drugIndex => {
     let currentPrice = drugs[drugIndex].buyPrice;
     let name = drugs[drugIndex].name.toLowerCase();
 
+
     console.log("Player is trying to buy " + name + " for " + currentPrice)
 
     //check to see if the player has the money and space to buy another unit
     if (cash > currentPrice && countHeld < maxStash) {
         console.log("buying!");
+
+        //keep track of the total inventory moved & the price
+        countMoved++;
+        totalCost += currentPrice;
+
         //add 1 unit of the relevant drug to the inventory and calculate the unit price
         inventory[name].count++;
         inventory[name].cost += currentPrice
@@ -898,14 +936,21 @@ const buyDrug = drugIndex => {
         //"move maximum possible" tries to buy / sell the max amount permitted by cash or by inventory
         if (moveMaximumPossible) {
             buyDrug(index); //so run this method again
-        } 
-    } else {
+        } else {
+            showMarketPopup(countMoved, name, totalCost); //the player is only buying 1 unit, so send it to the status popup now
+        }
+    } else { //the player is done buying max or they didn't have enough capacity to buy another unity
         console.error("insufficient funds or capacity to buy another unit of " + name)
+        showMarketPopup(countMoved, name, totalCost);
     }
+
+    
+
     
 }
 
 //take in an index value to match to the drugs array and then handle the logic to sell one unit of a drug. Uses the same pattern as buyDrug
+//really this function and buyDrug could be refactored into a moveDrug method that takes a parameter in to determine if it's a buy or sell operation. There's so much repeating in here
 const sellDrug = drugIndex => {
     let index = drugIndex;
     let currentPrice = drugs[drugIndex].sellPrice;
@@ -914,6 +959,11 @@ const sellDrug = drugIndex => {
     console.log("Player is trying to sell " + name + " for " + currentPrice)
     if (inventory[name].count > 0) {
         console.log("selling " + name)
+
+        //keep track of the cumulative count moved & total cost
+        countMoved--;
+        totalCost += currentPrice
+
         //subtract 1 unit of the relevant drug to the inventory and calculate the unit price
         inventory[name].count--;
         inventory[name].cost -= currentPrice
@@ -929,11 +979,52 @@ const sellDrug = drugIndex => {
         printDrugPrices();
         if (moveMaximumPossible) {
             sellDrug(index);
+        } else {
+            showMarketPopup(countMoved, name, totalCost);
         }
     } else {
         console.error("no more " + name + " in inventory")
+        showMarketPopup(countMoved, name, totalCost);
+    }
+    
+}
+
+//put a timed pop up on screen to show the player what just happened with their purchase attempt
+const showMarketPopup = (printCount, nameReceived, cost) => {
+    console.log("PrintCount: " + printCount + " Name: " + nameReceived)
+    countMoved = 0;
+    totalCost = 0;
+
+    let formattedCost = cost.toLocaleString(undefined, { useGrouping: true });
+
+    //this method takes positive and negative values for printCount and uses that to determine if the user bought or sold. So we take the abs value if printCount is < 0 so we print a positive number of units sold
+    let absCount = 0;
+    if (printCount < 0) {
+        absCount = Math.abs(printCount)
     }
 
+    marketStatusPopup.innerHTML = ``;
+    if (printCount < -1) {
+        marketStatusPopup.innerHTML = `You sold ${absCount} units of ${nameReceived} for $${formattedCost}`
+    }
+    if (printCount === -1) {
+        marketStatusPopup.innerHTML = `You sold ${absCount} unit of ${nameReceived} for $${formattedCost}`
+    }
+    if (printCount === 0) {
+        marketStatusPopup.innerHTML = `You did not buy anything. Do you have the space and the funds?`
+    } else if (printCount === 1) {
+        marketStatusPopup.innerHTML = `You bought ${printCount} unit of ${nameReceived} for $${formattedCost}`
+    } else if (printCount > 1) {
+        marketStatusPopup.innerHTML = `You bought ${printCount} units of ${nameReceived} for $${formattedCost}`
+    }
+
+    
+    marketStatusPopup.classList.remove("hide");
+    setTimeout(() => {
+        console.log("time out expired");
+        marketStatusPopup.classList.add("hide")
+    }, 2500)
+    
 }
 
 //print the stash details
@@ -1115,7 +1206,7 @@ const goUpsideYourHead = () => {
             checkHealth(`Sal the enforcer went upside your head with his ${means[rnd]}`); //we check to see if the player has died before moving on
 
             //and turn the activity buttons back on if the player has not died
-            i
+            activityButtonHolder.classList.remove("hide");
         })
     },0)
     
@@ -1124,6 +1215,9 @@ const goUpsideYourHead = () => {
 
 const checkHealth = causeOfPain => {
     if (health <= 0) {
+        //the player just died, so remove the saved game
+        localStorage.removeItem("savedGame");
+
         //the death message gets printed in the status panel which hitherto had been stuck to the top of the page. Bring it back into the middle for the death message
         topPanel.classList.remove("sticky-div") 
 
@@ -1134,13 +1228,27 @@ const checkHealth = causeOfPain => {
         actionPanel.classList.add("hide");
         dealPanel.classList.add("hide");
 
+        let didYouPayTaxes = ``
+        if (!grandmasTaxesPaid) {
+            didYouPayTaxes = `
+                <br/><p>Tough luck. Grandma lost the house and you lost your life.</p>
+                <br/><p>Your attempt was a total failure.</p>
+                <br/><p>Also those puppies and kitties were counting on YOU, man!</p>`
+
+        } else {
+            didYouPayTaxes = `
+                <br/><p>Tough luck. At least you managed to save Grandma's house.</p>
+                <br/><p>And all those orphans and those fuzzy critters too.</p>
+                <br/><p>But you lost your life in the process. Bummer.</p>`
+        }
+
         //define the death message and print it at the same time
         statusMessageHolder.innerHTML = `
             <p>You died on day ${day}. </p>
             <br/><p>Cause of death: ${causeOfPain}.</p>
-            <br/><p>Tough luck. Grandma lost the house and you lost your life.</p>
-            <br/><p>Your attempt was a total failure.</p>
-            <br/><p>Also those puppies and kitties were counting on YOU, man!</p>
+            ${didYouPayTaxes}
+           
+            
             <br/><div id="restart-game" class="button">I think you'd better try again</div> 
             `
         //grab a reference to the button you just created and then add a listener to make it refresh the page on click. This is my kludgy shortcut to starting a new game :)
@@ -1332,7 +1440,11 @@ const fightBack = (shots, bestWeaponHeld) => {
 
     for (let attempt = 0; attempt < shots; attempt++) {
         console.log("Shot Atempt: " + attempt);
-        fightBackInfoHolder.innerHTML += `<br/><p>BLAM!!</p>`
+        fightBackInfoHolder.innerHTML = ``;
+        setTimeout(() => {
+            fightBackInfoHolder.innerHTML += `<br/><p>BLAM!!</p>`
+        }, 100)
+        
         let accuracy = Random.int(0, 100) //roll a random shot value
         let hitThreshold = 25;
 
@@ -1347,23 +1459,25 @@ const fightBack = (shots, bestWeaponHeld) => {
 
             const insultList = ["piece of shit", "son of a bitch", "mother fucker", "asshole"]
             let rnd = Random.int(0, insultList.length - 1);
-
-            fightBackInfoHolder.innerHTML += `
+            setTimeout(() => {
+                fightBackInfoHolder.innerHTML += `
                 <br/><p>You hit that ${insultList[rnd]}!<br/><br/> You were able to get away.</p><br/>
                 <div id="continue-after-fight-button" class="button">Serves him right! (continue)</div>`
+                const continueAfterFightButton = document.querySelector("#continue-after-fight-button");
+                continueAfterFightButton.addEventListener("click", event => {
+                    fightBackInfoHolder.innerHTML = "";
 
-            const continueAfterFightButton = document.querySelector("#continue-after-fight-button");
-            continueAfterFightButton.addEventListener("click", event => {
-                fightBackInfoHolder.innerHTML = "";
+                    muggingPanel.classList.add("hide");
+                    activityButtonHolder.classList.remove("hide");
+                })
+            },150)
+            
 
-                muggingPanel.classList.add("hide");
-                activityButtonHolder.classList.remove("hide");
-            })
 
             break
-        } else { 
+        } else {
             fightBackInfoHolder.innerHTML += `<p>Oh, damn. You missed!</p>`
-            
+
             console.log("shot #" + attempt + " missed!")
         }
     }
@@ -1371,10 +1485,10 @@ const fightBack = (shots, bestWeaponHeld) => {
     if (!playerHitTarget) {
         setTimeout(() => {
             getShotAt();
-        }, 100)
-        
+        }, 200)
+
     }
-    
+
 }
 
 //when the player runs away, this method is used
@@ -1710,9 +1824,16 @@ const visitCountyOffice = () => {
    
 }
 
+const visitShop = () => {
+
+}
+
 //when the game is over i.e. time has expired, not because of player death. The outcome of the game is printed in here and then it prints a button that will let the player continue onto the high score function
 const gameOver = () => {
     const endOfGameMessageHolder = document.querySelector("#end-of-game-status-message")
+
+    //the player has just completed the game, delete the saved game
+    localStorage.removeItem("savedGame");
 
     let earnedTotal = cash + bank;
     let earnedTotalFormated = earnedTotal.toLocaleString(undefined, { useGrouping: true });
@@ -2041,11 +2162,55 @@ const reinitializeGame = () => {
 
 }
 
+//const chart = new JSC.Chart('stats-chart-id', {
+//    debug: 'true',
+//    type: 'line',
+//    series: ([
+//        {
+//            name: 'funds',
+
+//        }, {
+//            name: 'inventory',
+
+//        }
+//    ]),
+//    yAxis: {
+//        scaleRange: {
+//            min: 0, // minimum value
+//            max: 20000 // maximum value
+//        }
+//    }
+//})
+
+
+
+//let entryNumber = 0;
+
+//const updateStatsChart = () => {
+    
+//    chart.options({
+//        yAxis: {
+//            scaleRange: {
+//                min: 0, // minimum value
+//                max: 20000 // maximum value
+//            }
+//        }
+//    })
+//    entryNumber++;
+//    chart.series(0).points.add({ x: `${entryNumber}`, y: `${cash}` });
+
+//};
+
+
 //this logic runs on page load. This is the hook that gets you into all of the other functions above.
 
 loadObjectsJSON(); //and load the JSON objects for things like locations
 
 printWelcomeMessage(); //put the intro message on the screen
+
+
+
+
 
 
 
@@ -2055,12 +2220,10 @@ printWelcomeMessage(); //put the intro message on the screen
 //add json info - both in the drug category and then again in the inventory (you should probably generate the inventory dynamically based on a forEach of the names of the drugs in the drug list)
 
 //TODO:
-
-//wait to add the padding on the ui-parent until you click to start the game (this can be your first try at applying a css attribute via JS)
-//add a settings pane with
-    //theme options
-    //option to clear saved games
-    //button to view high scores
+//you've got the upgrade upgardes in the json and you're loading them into this script, time to generate the html i.e. mimic the guns panel logic
+//convert the stash info to a stats page, replace the table of inventory with a pie chart. That's going to involve including a library in your project, I think
+//also track your cash level every day and graph it. Maybe graph cash on one side and inventory on the other!
+//graphs!
 //the bones upgrade shop and are in place. Flesh them out
 //make the value of your inventory (as opposed to the overall count) contribute more to your chance of getting mugged
 //it's possible to have tony find you and get mugged at the same time. Make that not be possible

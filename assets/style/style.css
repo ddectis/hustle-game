@@ -420,6 +420,15 @@ a{
 
 }
 
+.popup {
+    border: 3px double #6cda82;
+    padding: 40px;
+    font-weight: bold;
+    position: fixed;
+    bottom: 12%;
+    background-color: #252525;
+}
+
 .bank-buttons-parent {
     display: flex;
     align-items: center;

@@ -220,6 +220,43 @@
       "playerHas": false
     }
   ],
+  "upgrades": [
+    {
+      "name": "Body Armor",
+      "attribute": "maxHealth",
+      "impact": 50,
+      "cost": 50000,
+      "has": false
+    },
+    {
+      "name": "Energy Shield",
+      "attribute": "maxHealth",
+      "impact": 150,
+      "cost": 500000,
+      "has": false
+    },
+    {
+      "name": "Extra Pockets",
+      "attribute": "maxStash",
+      "impact": 25,
+      "cost": 100000,
+      "has": false
+    },
+    {
+      "name": "Briefcase",
+      "attribute": "maxStash",
+      "impact": 25,
+      "cost": 250000,
+      "has": false
+    },
+    {
+      "name": "Duffle Bag",
+      "attribute": "maxStash",
+      "impact": 50,
+      "cost": 500000,
+      "has": false
+    }
+  ],
   "themes": [
     {
       "name": "standard",
