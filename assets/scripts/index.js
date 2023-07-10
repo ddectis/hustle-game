@@ -273,9 +273,23 @@ let drugPriceNewsString = ``; //this string will be used to store drug price ann
 //create a reference to the settings button and then attach 
 const settingsPanel = document.querySelector("#settings-panel")
 const settingsButton = document.querySelector("#settings-button")
+const closeSettingsButton = document.querySelector("#close-settings-button")
 settingsButton.addEventListener("click", event => {
+    toggleSettingsPanel();
+})
+closeSettingsButton.addEventListener("click", event => {
+    toggleSettingsPanel();
+})
+
+const toggleSettingsPanel = () => {
     actionPanel.classList.toggle("hide");
     settingsPanel.classList.toggle("hide");
+    closeSettingsButton.classList.toggle("hide")
+}
+
+const viewHighScoresButton = document.querySelector("#view-highscores-button")
+viewHighScoresButton.addEventListener("click", event => {
+    printHighScores();
 })
 
 //create a place to store the theme colors loaded in objects.json
@@ -403,6 +417,7 @@ const changeVisualTheme = (themeNumber) => {
 
     let backgroundColor = themeColors[themeNumber].backgroundColor;
     let textColor = themeColors[themeNumber].textColor;
+    let buttonBackgroundColor = themeColors[themeNumber].buttonBackgroundColor;
     let buttonTextColor = themeColors[themeNumber].buttonTextColor;
     let buttonShadowColor = themeColors[themeNumber].buttonDropShadowColor;
     let drugNameBackgroundColor = themeColors[themeNumber].storeColor;
@@ -418,7 +433,7 @@ const changeVisualTheme = (themeNumber) => {
     bodyElement.style.backgroundColor = backgroundColor;
     buttonElements.forEach(button => { //buttonElements is a node list, so you have to iterate over it
         button.style.color = buttonTextColor;
-        button.style.backgroundColor = textColor;
+        button.style.backgroundColor = buttonBackgroundColor;
         let boxShadowString = `${buttonShadowColor} 3px 5px 0px`
         console.log(boxShadowString);
         button.style.boxShadow = boxShadowString;
@@ -547,6 +562,8 @@ gameStartButton.addEventListener("click", event => {
 //continue from intro click - this is where the game actually begins
 continueFromIntroButton.addEventListener("click", event => {
     console.log("continue from intro button clicked");
+
+
     initializeGame();
     
 })
@@ -554,6 +571,8 @@ continueFromIntroButton.addEventListener("click", event => {
 const initializeGame = () => {
     const title = document.querySelector("#title")
     title.classList.add("hide")
+    settingsPanel.classList.add("hide")
+    settingsPanel.classList.add("ui-padding")
 
     //define the status message based on current burrough
     updateStatusMessage();
@@ -1841,6 +1860,70 @@ const highScoreHandling = (gameScore) => {
     })
 }
 
+//this function loads the highscores and prints them on screen - this is reached from the options
+const printHighScores = () => {
+
+    topPanel.classList.add("hide")
+    settingsPanel.classList.add("hide")
+
+    //define the places on the page that you'll be using here and unhide the main panel
+    const highScorePanel = document.querySelector("#highscore-panel");
+    highScorePanel.classList.remove("hide");
+    const highScoreMessage = document.querySelector("#high-score-message");
+    highScoreMessage.innerHTML = ``;
+    
+
+    //load the saved high scores from local storage
+    const savedHighscores = localStorage.getItem("highScores")
+
+    //create an array to store them in
+    let highscores = [];
+
+    //check to see if you mapped anything to savedHigscores (i.e. if the saved file exists)
+    if (savedHighscores) {
+        console.log("high scores file loaded")
+        //if so map the loaded high score objects to the highscores[] array
+        highscores = JSON.parse(savedHighscores)
+        
+    } else {
+        console.log("high score file does not exist.")
+        highScoreMessage.insertAdjacentHTML("beforeend", `<h2>There are no high scores yet! Keep playing :)</h2>`)
+    }
+
+    console.log(highscores)
+
+    let target = highscores.length;
+    
+    //check the amount of high scores saved
+    if (highscores.length <= 19) {
+        target = highscores.length;
+    } else {
+        target = 19; //target of 19 prints the top 20 scores
+    }
+
+    //generate HTML for the high score objects
+    for (let scoreIndex = 0; scoreIndex < target; scoreIndex++) {
+        let printIndex = scoreIndex + 1;
+        console.log(scoreIndex);
+        highScoreMessage.insertAdjacentHTML("beforeEnd", `<div class="high-score-entry""><h3>#${printIndex}</h3><h3 id="entry-${printIndex}">replace-me</h3><h3>$${highscores[scoreIndex].score.toLocaleString(undefined, { useGrouping: true })}</h3></div>`)
+        const playerName = document.querySelector(`#entry-${printIndex}`);
+        console.log(playerName)
+        let name = highscores[scoreIndex].name.slice(0, 15); //trim the name to 16 characters max
+
+        playerName.textContent = name;
+    }
+
+    highScoreMessage.insertAdjacentHTML("beforeend", `<br/><div class="button" id="close-scores-button"><h3>Close Scores</h3></div>`)
+
+    const closeScoresButton = document.querySelector("#close-scores-button");
+    closeScoresButton.addEventListener("click", event => {
+        highScorePanel.classList.add("hide");
+        topPanel.classList.remove("hide");
+        settingsPanel.classList.remove("hide");
+    })
+
+}
+
 const saveGame = () => {
     //create an object that contains every value that you wish you save
     console.log("inventory just ahead of save:")
@@ -1972,11 +2055,12 @@ printWelcomeMessage(); //put the intro message on the screen
 //add json info - both in the drug category and then again in the inventory (you should probably generate the inventory dynamically based on a forEach of the names of the drugs in the drug list)
 
 //TODO:
-//make the very first theme options work. Use Orange. You're going to keep the background color the same but apply the orange color to the text and button background color. Apply the button drop shadow to the drop shadow
+
 //wait to add the padding on the ui-parent until you click to start the game (this can be your first try at applying a css attribute via JS)
 //add a settings pane with
     //theme options
     //option to clear saved games
+    //button to view high scores
 //the bones upgrade shop and are in place. Flesh them out
 //make the value of your inventory (as opposed to the overall count) contribute more to your chance of getting mugged
 //it's possible to have tony find you and get mugged at the same time. Make that not be possible

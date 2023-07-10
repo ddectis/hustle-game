@@ -154,7 +154,7 @@ a{
     flex-direction: column;
     align-items: center;
     width: 98%;
-    padding-top: 40%;
+    
 
 }
 
@@ -173,8 +173,8 @@ a{
     justify-content: center;
     
     flex-direction: column;
-    align-items: flex-start;
-    padding-top:20%;
+    align-items: center;
+    
     width:100%;
     
 }
@@ -216,7 +216,7 @@ a{
     padding-block: 10px;
     flex-direction: column;
     align-items: center;
-
+    margin-block:15px;
 }
 
 
@@ -276,7 +276,6 @@ a{
 .drug-name {
     width: 100%;
     background-color: #6cda8282;
-    color: #252525;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -296,7 +295,7 @@ a{
 }
 
 .add-space-top{
-    margin-top:20px;
+    margin-block:20px;
 }
 
 .stash-info-holder{
@@ -342,6 +341,10 @@ a{
 }
 
 .min-width{
+
+}
+
+.settings{
 
 }
 
@@ -502,16 +505,13 @@ a{
 
 .button-blue-theme {
     background-color: #6c7dda;
-    color: #cdcdcd;
-    box-shadow: #404a80 3px 5px 0px;
-    
+    color: #232323;
+    box-shadow: #343d6d 3px 5px 0px;
     solid 2px #498154;
     padding-inline: 1%;
     padding-block: 2px;
     border-radius: 5px;
     text-align: center;
-    
-    
     font-weight: bold;
     text-decoration: underline;
     margin: 5px;
@@ -519,13 +519,16 @@ a{
     align-items: center;
     justify-content: center;
     cursor: pointer;
-   
     flex-direction: column;
 }
 
 .high-score-entry {
     display: flex;
     justify-content: space-between;
+}
+
+.ui-padding {
+    padding-top: 55%;
 }
 
 .hide {
@@ -536,7 +539,11 @@ a{
 
 @media screen and (min-width:450px) {
     .actions-holder{
-        padding-top: 14%;
+        
+    }
+
+    .ui-padding {
+        padding-top: 45%;
     }
     
 }
@@ -547,9 +554,7 @@ a{
         flex-direction: row;
     }
 
-    .ui-parent {
-        padding-top: 18%;
-    }
+
 
     h2{
         font-size:1.7em;
@@ -577,8 +582,10 @@ a{
         
     }
 
-    .actions-holder{
-        padding-top:11%;
+    
+
+    .ui-padding {
+        padding-top: 40%;
     }
 
     .ui-holder {
@@ -629,14 +636,11 @@ a{
         transform: rotate(0deg);
     }
 
-    .actions-holder{
-        padding-top:14%;
+
+    .ui-padding {
+        padding-top: 26%;
     }
 }
 
-@media screen and (min-width: 1000px) {
-    .actions-holder{
-        padding-top: 9%;
-    }
-}
+
 
