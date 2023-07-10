@@ -2162,44 +2162,44 @@ const reinitializeGame = () => {
 
 }
 
-//const chart = new JSC.Chart('stats-chart-id', {
-//    debug: 'true',
-//    type: 'line',
-//    series: ([
-//        {
-//            name: 'funds',
+const chart = new JSC.Chart('stats-chart-id', {
+    debug: 'true',
+    type: 'line',
+    series: ([
+        {
+            name: 'funds',
 
-//        }, {
-//            name: 'inventory',
+        }, {
+            name: 'inventory',
 
-//        }
-//    ]),
-//    yAxis: {
-//        scaleRange: {
-//            min: 0, // minimum value
-//            max: 20000 // maximum value
-//        }
-//    }
-//})
+        }
+    ]),
+    yAxis: {
+        scaleRange: {
+            min: 0, // minimum value
+            max: 20000 // maximum value
+        }
+    }
+})
 
 
 
-//let entryNumber = 0;
+let entryNumber = 0;
 
-//const updateStatsChart = () => {
+const updateStatsChart = () => {
     
-//    chart.options({
-//        yAxis: {
-//            scaleRange: {
-//                min: 0, // minimum value
-//                max: 20000 // maximum value
-//            }
-//        }
-//    })
-//    entryNumber++;
-//    chart.series(0).points.add({ x: `${entryNumber}`, y: `${cash}` });
+    chart.options({
+        yAxis: {
+            scaleRange: {
+                min: 0, // minimum value
+                max: 20000 // maximum value
+            }
+        }
+    })
+    entryNumber++;
+    chart.series(0).points.add({ x: `${entryNumber}`, y: `${cash}` });
 
-//};
+};
 
 
 //this logic runs on page load. This is the hook that gets you into all of the other functions above.
