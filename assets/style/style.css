@@ -421,12 +421,13 @@ a{
 }
 
 .popup {
-    border: 3px double #6cda82;
+    border: 6px double #6cda82;
     padding: 40px;
     font-weight: bold;
     position: fixed;
-    bottom: 12%;
+    bottom: 1%;
     background-color: #252525;
+    box-shadow: #252525 0px 0px 12px 13px;
 }
 
 .bank-buttons-parent {

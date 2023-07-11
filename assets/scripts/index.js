@@ -310,7 +310,7 @@ let playerStats = []; //player stats will be recorded here every turn. This data
 
 
 
-const welcomeMessage = `<p>Oh, man. <br/><br/>The county tax assessor 
+const welcomeMessage = `<p>Oh, man. <br/><br/>The Queens county tax assessor 
 says Grandma is gonna lose the house. 
 <br />
 <br />
@@ -319,7 +319,8 @@ Also the house is an orphanage.
 <br />
 For kittens and puppies.
 <br /><br />
-You need to raise $1,000,000 in 30 days...OR ELSE!</p>`
+You need to raise $1,000,000 in 30 days...OR ELSE!</p>
+<div class="actions"><p><b><u>Goal:</u> Go to the Queens County Assessor's Office and Pay Grandma's tax bill</b></p></div>`
 
 const introMessage = `<p>
 
@@ -623,7 +624,7 @@ const updateInfoPanelStats = () => {
     stashUI.textContent = `${countHeld} / ${maxStash}`;
     console.log("UI values updated");
 
-    updateStatsChart();
+    //updateStatsChart();
 
 
     //generally when we update the info panel, we also want to save the game. However, we do not want to save the game when we first set the UI. This logic handles that
@@ -1011,7 +1012,7 @@ const showMarketPopup = (printCount, nameReceived, cost) => {
         marketStatusPopup.innerHTML = `You sold ${absCount} unit of ${nameReceived} for $${formattedCost}`
     }
     if (printCount === 0) {
-        marketStatusPopup.innerHTML = `You did not buy anything. Do you have the space and the funds?`
+        marketStatusPopup.innerHTML = `You did not buy or sell anything. Do you have the space, funds or inventory?`
     } else if (printCount === 1) {
         marketStatusPopup.innerHTML = `You bought ${printCount} unit of ${nameReceived} for $${formattedCost}`
     } else if (printCount > 1) {
@@ -1275,7 +1276,7 @@ const visitBank = () => {
 //handles banking deposits
 const deposit = percent => {
     console.log("Depositing: " + percent);
-    let depositAmount = cash * percent / 100;
+    let depositAmount = Math.round(cash * percent / 100);
     bank += depositAmount;
     cash -= depositAmount;
     updateInfoPanelStats();
@@ -1285,7 +1286,7 @@ const deposit = percent => {
 //handles banking withdrawals
 const withdraw = percent => {
     console.log("Withdrawing: " + percent);
-    let withdrawAmount = bank * percent / 100;
+    let withdrawAmount = Math.round(bank * percent / 100);
     bank -= withdrawAmount;
     cash += withdrawAmount;
     updateInfoPanelStats();
@@ -1825,7 +1826,7 @@ const visitCountyOffice = () => {
 }
 
 const visitShop = () => {
-
+    
 }
 
 //when the game is over i.e. time has expired, not because of player death. The outcome of the game is printed in here and then it prints a button that will let the player continue onto the high score function
@@ -1963,7 +1964,7 @@ const highScoreHandling = (gameScore) => {
         //generate HTML for the high score objects
         for (let scoreIndex = 0; scoreIndex <= target; scoreIndex++) {
             let printIndex = scoreIndex + 1;
-            highScoreMessage.insertAdjacentHTML("beforeEnd", `<div class="high-score-entry""><h3>#${printIndex}</h3><h3 id="entry-${printIndex}">replace-me</h3><h3>$${highscores[scoreIndex].score.toLocaleString(undefined, { useGrouping: true })}</h3></div>`)
+            highScoreMessage.insertAdjacentHTML("beforeEnd", `<div class="high-score-entry""><p>#${printIndex}</p><p id="entry-${printIndex}">replace-me</p><p>$${highscores[scoreIndex].score.toLocaleString(undefined, { useGrouping: true })}</p></div>`)
             const playerName = document.querySelector(`#entry-${printIndex}`);
             console.log(playerName)
             let name = highscores[scoreIndex].name.slice(0, 15); //trim the name to 16 characters max
@@ -2026,7 +2027,7 @@ const printHighScores = () => {
     for (let scoreIndex = 0; scoreIndex < target; scoreIndex++) {
         let printIndex = scoreIndex + 1;
         console.log(scoreIndex);
-        highScoreMessage.insertAdjacentHTML("beforeEnd", `<div class="high-score-entry""><h3>#${printIndex}</h3><h3 id="entry-${printIndex}">replace-me</h3><h3>$${highscores[scoreIndex].score.toLocaleString(undefined, { useGrouping: true })}</h3></div>`)
+        highScoreMessage.insertAdjacentHTML("beforeEnd", `<div class="high-score-entry""><p>#${printIndex}</p><p id="entry-${printIndex}">replace-me</p><p>$${highscores[scoreIndex].score.toLocaleString(undefined, { useGrouping: true })}</p></div>`)
         const playerName = document.querySelector(`#entry-${printIndex}`);
         console.log(playerName)
         let name = highscores[scoreIndex].name.slice(0, 15); //trim the name to 16 characters max
