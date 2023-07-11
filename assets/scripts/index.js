@@ -392,25 +392,26 @@ const loadObjectsJSON = async() => {
         console.error("Error loading JSON file:", error);
     }
 
+    let timeStamp = new Date()
 
     //and then add listeners to make the theme buttons do something
     standardThemeButton.addEventListener("click", event => {
         console.log("standard theme button clicked");
         //changeVisualTheme(0)
-        cssReference.href = "./assets/style/style.css"
+        cssReference.href = `./assets/style/style.css?${timeStamp}`
     })
     lightThemeButton.addEventListener("click", event => {
         console.log("light theme button clicked");
         //changeVisualTheme(1)
-        cssReference.href = "./assets/style/style-light.css"
+        cssReference.href = `./assets/style/style-light.css?${timeStamp}`
     })
     orangeThemeButton.addEventListener("click", event => {
         console.log("orange theme button clicked");
-        cssReference.href = "./assets/style/style-orange.css"
+        cssReference.href = `./assets/style/style-orange.css?${timeStamp}`
     })
     blueThemeButton.addEventListener("click", event => {
         console.log("blue theme button clicked");
-        cssReference.href = "./assets/style/style-blue.css"
+        cssReference.href = `./assets/style/style-blue.css?${timeStamp}`
     })
 
     loadGame(); //check to see if the player has a game in progress
@@ -422,6 +423,7 @@ const loadObjectsJSON = async() => {
 
 }
 
+//deprecated. This was the first way I learned to change styling with js. Then I learned about switching style sheets and left this janky method behind
 const changeVisualTheme = (themeNumber) => {
     console.log("loading theme: " + themeNumber)
     console.log(themeColors[themeNumber].backgroundColor)
