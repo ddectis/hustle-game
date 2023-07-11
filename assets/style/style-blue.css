@@ -69,14 +69,14 @@ p{
 }
 
 body {
-    background-color: #252525;
+    background-color: #404a80;
     font-family: 'JetBrains Mono', monospace;
-    color: #6cda82;
+    color: #e5e5e5;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
     justify-content: flex-start;
-    align-items:center;
+    align-items: center;
 }
 
 
@@ -98,8 +98,8 @@ body {
     flex-direction: column;
     width: 95%;
     justify-content: center;
-    background: #252525;
-    border-bottom: 10px ridge #6cda82;
+    background: #404a80;
+    border-bottom: 10px ridge #e5e5e5;
 }
 
 .status {
@@ -118,8 +118,8 @@ body {
     padding-block: 2px;
     border-radius: 5px;
     text-align: center;
-    background-color: #6cda82;
-    color: #252525;
+    background-color: #25252590;
+    color: #cbc8c8;
     font-weight: bold;
     text-decoration: underline;
     margin: 5px;
@@ -127,8 +127,8 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: #498154 3px 5px 0px;
-    flex-direction:column;
+    box-shadow: #252525 3px 5px 0px;
+    flex-direction: column;
 }
 
 
@@ -161,7 +161,7 @@ a{
 .ui-holder {
     display: flex;
     justify-content: space-around;
-    border: 3px double #6cda82;
+    border: 3px double #dad06c;
     flex-direction: row;
     align-items: center;
     min-width: 50%;
@@ -209,14 +209,14 @@ a{
 
 .actions {
     display: flex;
-    border: 3px double #6cda82;
+    border: 3px double #dad06c;
     padding: 5px;
     margin: 2px;
     width: 100%;
     padding-block: 10px;
     flex-direction: column;
     align-items: center;
-    margin-block:15px;
+    margin-block: 15px;
 }
 
 
@@ -249,12 +249,12 @@ a{
 }
 
 .drug-deal {
-    outline: 3px double #6cda82;
+    outline: 3px double #dad06c;
     display: flex;
-    flex-direction:column;
+    flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    width:100%;
+    width: 100%;
 }
 
 .drug-listing {
@@ -275,7 +275,7 @@ a{
 
 .drug-name {
     width: 100%;
-    background-color: #6cda8282;
+    background-color: #25252590;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -298,14 +298,14 @@ a{
     margin-block:20px;
 }
 
-.stash-info-holder {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+.stash-info-holder{
+    display:flex;
+    flex-direction:column;
+    width:100%;
 }
 
 .stash-card {
-    outline: 3px double #6cda82;
+    outline: 3px double #dad06c;
     height: 80px;
     display: flex;
     align-items: center;
@@ -422,13 +422,13 @@ a{
 }
 
 .popup {
-    border: 6px double #6cda82;
+    border: 6px double #dad06c;
     padding: 40px;
     font-weight: bold;
     position: fixed;
     bottom: 1%;
-    background-color: #252525;
-    box-shadow: #252525 0px 0px 12px 13px;
+    background-color: #404a80;
+    box-shadow: #e5e5e5 0px 0px 12px 13px;
 }
 
 .shop-button-holder {

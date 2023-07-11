@@ -306,6 +306,9 @@ const lightThemeButton = document.querySelector("#light-theme-button");
 const orangeThemeButton = document.querySelector("#orange-theme-button");
 const blueThemeButton = document.querySelector("#blue-theme-button");
 
+const cssReference = document.querySelector("#stylesheet");
+
+
 let playerStats = []; //player stats will be recorded here every turn. This data will be used to make graphs
 
 
@@ -393,19 +396,21 @@ const loadObjectsJSON = async() => {
     //and then add listeners to make the theme buttons do something
     standardThemeButton.addEventListener("click", event => {
         console.log("standard theme button clicked");
-        changeVisualTheme(0)
+        //changeVisualTheme(0)
+        cssReference.href = "./assets/style/style.css"
     })
     lightThemeButton.addEventListener("click", event => {
         console.log("light theme button clicked");
-        changeVisualTheme(1)
+        //changeVisualTheme(1)
+        cssReference.href = "./assets/style/style-light.css"
     })
     orangeThemeButton.addEventListener("click", event => {
         console.log("orange theme button clicked");
-        changeVisualTheme(2)
+        cssReference.href = "./assets/style/style-orange.css"
     })
     blueThemeButton.addEventListener("click", event => {
         console.log("blue theme button clicked");
-        changeVisualTheme(3)
+        cssReference.href = "./assets/style/style-blue.css"
     })
 
     loadGame(); //check to see if the player has a game in progress
@@ -523,7 +528,7 @@ const travelClick = destination => {
 
     day++;
     let interest = debt * interestRate / 100
-    let trimmedInterest = parseFloat(interest.toFixed(2));
+    let trimmedInterest = parseFloat(interest.toFixed(0));
 
     //travel makes the day count increase so add debt
     debt += trimmedInterest; //make sure you are only adding numbers with 2 digits after the deci
@@ -1068,7 +1073,7 @@ const visitTony = () => {
                 <h3>Debt: $${debt}</h3>
                 <br />
                 <div id="pay-500" class="button">Pay $500</div>
-                <br/><div id="pay-max" class="button">Pay $${debt}</div>
+                <br/><div id="pay-max" class="button">Pay $${debt.toLocaleString(undefined, { useGrouping: true })}</div>
             </div>
         </div>
         `
@@ -1091,8 +1096,8 @@ const visitTony = () => {
     } else {
         loanInfoHolder.innerHTML = `
         <div class="loan-holder">
-            <h3>Tony says, "Pleasure doin' business with ya. Thanks for being as honest and upstanding as I am."</h3>
-            <h3>"Now get outta here before I take a piece of your action!"</h3>
+            <p>Tony says, "Pleasure doin' business with ya. Thanks for being as honest and upstanding as I am."</p>
+            <p>"Now get outta here before I take a piece of your action!"</p>
 
         </div>
         `
