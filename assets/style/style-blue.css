@@ -161,7 +161,7 @@ a{
 .ui-holder {
     display: flex;
     justify-content: space-around;
-    border: 3px double #dad06c;
+    border: 3px double #e5e5e5;
     flex-direction: row;
     align-items: center;
     min-width: 50%;
@@ -209,7 +209,7 @@ a{
 
 .actions {
     display: flex;
-    border: 3px double #dad06c;
+    border: 3px double #e5e5e5;
     padding: 5px;
     margin: 2px;
     width: 100%;
@@ -249,7 +249,7 @@ a{
 }
 
 .drug-deal {
-    outline: 3px double #dad06c;
+    outline: 3px double #e5e5e5;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -305,7 +305,7 @@ a{
 }
 
 .stash-card {
-    outline: 3px double #dad06c;
+    outline: 3px double #e5e5e5;
     height: 80px;
     display: flex;
     align-items: center;
@@ -422,7 +422,7 @@ a{
 }
 
 .popup {
-    border: 6px double #dad06c;
+    border: 6px double #e5e5e5;
     padding: 40px;
     font-weight: bold;
     position: fixed;
