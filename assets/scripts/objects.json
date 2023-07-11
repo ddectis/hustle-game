@@ -222,10 +222,21 @@
   ],
   "upgrades": [
     {
+      "name": "Flak Jacket",
+      "attribute": "maxHealth",
+      "impact": 25,
+      "cost": 50000,
+      "id": "flak",
+      "description": "+25 MAX HP",
+      "has": false
+    },
+    {
       "name": "Body Armor",
       "attribute": "maxHealth",
       "impact": 50,
       "cost": 50000,
+      "id": "armor",
+      "description": "+50 MAX HP",
       "has": false
     },
     {
@@ -233,6 +244,8 @@
       "attribute": "maxHealth",
       "impact": 150,
       "cost": 500000,
+      "id": "shield",
+      "description": "+150 MAX HP",
       "has": false
     },
     {
@@ -240,6 +253,8 @@
       "attribute": "maxStash",
       "impact": 25,
       "cost": 100000,
+      "id": "pockets",
+      "description": "+25 CAPACITY",
       "has": false
     },
     {
@@ -247,6 +262,8 @@
       "attribute": "maxStash",
       "impact": 25,
       "cost": 250000,
+      "id": "brief",
+      "description": "+25 CAPACITY",
       "has": false
     },
     {
@@ -254,6 +271,8 @@
       "attribute": "maxStash",
       "impact": 50,
       "cost": 500000,
+      "id": "duffle",
+      "description": "+50 CAPACITY",
       "has": false
     }
   ],
@@ -266,6 +285,7 @@
       "buttonDropShadowColor": "#498154",
       "buttonTextColor": "#252525",
       "storeColor": "#6cda8282"
+      
     },
     {
       "name": "light",

@@ -430,6 +430,12 @@ a{
     box-shadow: #252525 0px 0px 12px 13px;
 }
 
+.shop-button-holder {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
 .bank-buttons-parent {
     display: flex;
     align-items: center;
@@ -629,6 +635,9 @@ a{
     }
     #county-info {
         max-width:75%;
+    }
+    .ui-parent{
+        width:50%;
     }
 }
 

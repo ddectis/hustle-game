@@ -354,6 +354,7 @@ const loadObjectsJSON = async() => {
         drugs = objects.drugs;
         inventory = objects.playerInfo.inventory;
         weapons = objects.weapons;
+        upgrades = objects.upgrades;
         themeColors = objects.themes;
 
         console.log(themeColors);
@@ -373,7 +374,6 @@ const loadObjectsJSON = async() => {
                 `<div class="button padding-block-5" id="${burrough.name.toLowerCase()}-button">Travel to ${burrough.name}`)
             
         })
-
         
         console.log(objects.playerInfo);
         //load the game variables from the json
@@ -1063,10 +1063,13 @@ const visitTony = () => {
     if (debt > 0) {
         loanInfoHolder.innerHTML =
         `<div class="loan-holder">
-            <h3>Tony expects payment in ${loanDaysRemaining} ${dayOrDays}</h3>
-            <h3>Debt: $${debt}</h3>
-            <br />
-            <div id="pay-500" class="button">Pay $500</div>
+            <h3>Tony expects payment in ${loanDaysRemaining} ${dayOrDays}.</h3>
+            <div class="actions">
+                <h3>Debt: $${debt}</h3>
+                <br />
+                <div id="pay-500" class="button">Pay $500</div>
+                <br/><div id="pay-max" class="button">Pay $${debt}</div>
+            </div>
         </div>
         `
 
@@ -1074,6 +1077,17 @@ const visitTony = () => {
         pay500Button.addEventListener("click", () => {
             payDebt();
         })
+
+        const payMaxButton = document.querySelector("#pay-max");
+        payMaxButton.addEventListener("click", event => {
+            if (cash > debt) {
+                cash -= debt;
+                debt = 0;
+                updateInfoPanelStats();
+                visitTony();
+            }
+        })
+
     } else {
         loanInfoHolder.innerHTML = `
         <div class="loan-holder">
@@ -1087,7 +1101,7 @@ const visitTony = () => {
 
 }
 
-
+//this is a silly method that should have been rewritten
 const payDebt = () => {
 
     //check debt levels and subtract 500 if > 500 remaining, or subtract remaining if not
@@ -1827,6 +1841,124 @@ const visitCountyOffice = () => {
 
 const visitShop = () => {
     
+    
+    
+    //change all this code to make sense for the shop instead of the gun shop
+    shopInfoHolder.innerHTML = `<br/><p>Welcome to Eddie's. What do you need?</p>`
+
+    const shopButtonHolder = document.querySelector("#shop-button-holder")
+    shopInfoHolder.innerHTML = ``;
+    shopButtonHolder.innerHTML = ``;
+    console.log(shopButtonHolder)
+    //generate a button for each shop item
+    upgrades.forEach(upgrade => {
+        //but only if the player doesn't already have that gun in their possession
+        let playerHas = false;
+        playerHas = upgrade.has;
+        //console.log(gun);
+        //console.log(playerHas)
+        if (upgrade.has !== true) {
+            //console.log(gun.name + " " + gun.cost)
+            shopButtonHolder.insertAdjacentHTML("beforeend", `
+        <div id="buy-${upgrade.id}" class="button justify-content-space-between padding-inline-5"><h2>${upgrade.name.toUpperCase()}</h2><h2>$${upgrade.cost.toLocaleString(undefined, { useGrouping: true })}</h2><p>${upgrade.description}</p></div>
+        `)
+        }
+
+    })
+
+    const buyFlakButton = document.querySelector("#buy-flak");
+    const buyArmorButton = document.querySelector("#buy-armor");
+    const buyShieldButton = document.querySelector("#buy-shield");
+    const buyPocketsButton = document.querySelector("#buy-pockets");
+    const buyBriefButton = document.querySelector("#buy-brief");
+    const buyDuffleButton = document.querySelector("#buy-duffle");
+
+
+    //add listeners to the buy buttons, if they exist
+    try {
+        buyFlakButton.addEventListener("click", event => {
+            console.log(event.srcElement.id + " click")
+            buyUpgrade(0)
+        })
+    } catch {
+        console.log("Buy Flak Jacket Button doesn't exist because the player has already bought it")
+    }
+
+    try {
+        buyArmorButton.addEventListener("click", event => {
+            console.log(event.srcElement.id + " click")
+            buyUpgrade(1)
+        })
+    } catch {
+        console.log("Buy Body Armor Button doesn't exist because the player has already bought it")
+    }
+
+    try {
+        buyShieldButton.addEventListener("click", event => {
+            console.log(event.srcElement.id + " click")
+            buyUpgrade(2)
+        })
+    } catch {
+        console.log("Buy Energy Shield Button doesn't exist because the player has already bought it")
+    }
+
+    try {
+        buyPocketsButton.addEventListener("click", event => {
+            console.log(event.srcElement.id + " click")
+            buyUpgrade(3)
+        })
+    } catch {
+        console.log("Buy Extra Pockets Button doesn't exist because the player has already bought it")
+    } 
+
+    try {
+        buyBriefButton.addEventListener("click", event => {
+            console.log(event.srcElement.id + " click")
+            buyUpgrade(4)
+        })
+    } catch {
+        console.log("Buy Brief Case Button doesn't exist because the player has already bought it")
+    }
+    try {
+        buyDuffleButton.addEventListener("click", event => {
+            console.log(event.srcElement.id + " click")
+            buyUpgrade(5)
+        })
+    } catch {
+        console.log("Buy Buy Duffle Button doesn't exist because the player has already bought it")
+    }
+
+    const buyUpgrade = (upgrade) => {
+
+        //check to see if the player has enough money to buy the gun
+        if (cash >= upgrades[upgrade].cost) {
+            console.log("buying " + upgrades[upgrade].name)
+            shopInfoHolder.innerHTML = `<br/><p>Enjoy your ${upgrades[upgrade].name}. Use it in good health. <br/>Good health for you, anyway heh heh heh.`
+            cash -= upgrades[upgrade].cost;
+            upgrades[upgrade].has = true;
+            updateInfoPanelStats();
+            applyUpgrade(upgrade);
+            visitShop(); //to update the visible buttons i.e. remove the button that the player just bought
+
+        } else {
+            console.error("insufficient funds");
+
+            shopInfoHolder.innerHTML = `<br/><p>You ain't got the money for that ${upgrades[upgrade].name}! <br/>Put that shit down and quit Wasting my time!</p>`
+        }
+    }
+
+    const applyUpgrade = (upgrade) => {
+        console.log("Applying upgrade: " + upgrade)
+        if (upgrade <= 2) {
+            maxHealth += upgrades[upgrade].impact;
+            console.log("applying max health upgrade. Max health +" + upgrades[upgrade].impact)
+        } else {
+            console.log("applying inventory upgrade")
+            maxStash += upgrades[upgrade].impact;
+            console.log("applying max stash upgrade. Max stash +" + upgrades[upgrade].impact)
+        }
+        updateInfoPanelStats();
+    }
 }
 
 //when the game is over i.e. time has expired, not because of player death. The outcome of the game is printed in here and then it prints a button that will let the player continue onto the high score function
@@ -2061,7 +2193,8 @@ const saveGame = () => {
         "maxStash": maxStash,
         "inventory": inventory,
         "weapons": weapons,
-        "taxPaid": grandmasTaxesPaid
+        "taxPaid": grandmasTaxesPaid,
+        "location": currentLocation,
     }
     
     console.log(saveObject)
@@ -2102,6 +2235,7 @@ const loadGame = () => {
         inventory = loadedObject.inventory;
         weapons = loadedObject.weapons;
         grandmasTaxesPaid = loadedObject.taxPaid;
+        currentLocation = loadedObject.location;
 
         console.log("found a saved game to load")
         console.log(loadedObject)
@@ -2115,9 +2249,19 @@ const loadGame = () => {
     if (gameLoaded) {
         gameStartButton.classList.add("hide");
 
+        let taxPaid = ``;
+        if (!grandmasTaxesPaid) {
+            taxPaid = `You need to go to Queens to pay Grandma's $1M tax bill before day 30.`
+        } else {
+            taxPaid = `You already paid Grandma's tax bill. Well done. Maximize your $$$ until day 30!`
+        }
+
         statusMessageHolder.innerHTML = `
             <h2>You have a saved game in progress.</h2>
-            <br/><p>You are on day ${day} and you have $${cash.toLocaleString(undefined, { useGrouping: true })}</p>
+            <br/><p>It is day ${day} and you are in ${burroughs[currentLocation].name}.
+            <br/><br/>You have $${cash.toLocaleString(undefined, { useGrouping: true })} in hand and $${bank.toLocaleString(undefined, { useGrouping: true })} in the bank.
+            <br/><br/>${taxPaid}</p>
+            <br/>
             <br/>
             <div class="button" id="continue-game-button">Continue Saved Game</div>`
 
@@ -2221,11 +2365,13 @@ printWelcomeMessage(); //put the intro message on the screen
 //add json info - both in the drug category and then again in the inventory (you should probably generate the inventory dynamically based on a forEach of the names of the drugs in the drug list)
 
 //TODO:
-//you've got the upgrade upgardes in the json and you're loading them into this script, time to generate the html i.e. mimic the guns panel logic
+//to fix the themeing thing, instead of applying inline styles, what you want to do is include another css file in <head>
+
+
 //convert the stash info to a stats page, replace the table of inventory with a pie chart. That's going to involve including a library in your project, I think
 //also track your cash level every day and graph it. Maybe graph cash on one side and inventory on the other!
 //graphs!
-//the bones upgrade shop and are in place. Flesh them out
+
 //make the value of your inventory (as opposed to the overall count) contribute more to your chance of getting mugged
 //it's possible to have tony find you and get mugged at the same time. Make that not be possible
 
